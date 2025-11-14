@@ -9932,7 +9932,8 @@ function renderBoxes() {
         const isCurrent = gameState.boxesUnlocked === index;
 
         const boxElement = document.createElement('div');
-        boxElement.className = `${isUnlocked ? 'unlocked-box' : 'locked-box'} cursor-pointer transition-all duration-500 bounce-in`;
+        // Ne pas rendre cliquable les coffres déjà déverrouillés
+        boxElement.className = `${isUnlocked ? 'unlocked-box' : 'locked-box'} ${isCurrent ? 'cursor-pointer' : isUnlocked ? '' : ''} transition-all duration-500 bounce-in`;
         boxElement.style.animationDelay = `${index * 0.1}s`;
 
         // Utiliser un coffre-fort pour les coffres pairs, un coffre au trésor pour les impairs
@@ -9971,7 +9972,8 @@ function renderBoxes() {
             </div>
         `;
 
-        if (isCurrent || isUnlocked) {
+        // Seulement le coffre actuel est cliquable (pas les déverrouillés)
+        if (isCurrent) {
             boxElement.addEventListener('click', () => {
                 playSound('tick');
                 createChestOpenEffect(boxElement); // Effet de particules !
