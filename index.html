@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="fr" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Évacuation Incendie - Formation Interactive</title>
+    <title>Chasse au Trésor SST - Multijoueur</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -233,9 +232,9 @@
         <!-- Écran d'authentification par mot de passe -->
         <div id="auth-screen" class="max-w-md mx-auto">
             <div class="text-center mb-8 bounce-in">
-                <div class="text-8xl mb-6">👨‍🏫</div>
+                <div class="text-8xl mb-6">👨🏫</div>
                 <h1 class="text-4xl md:text-5xl font-bold text-primary mb-4">Accès Superviseur</h1>
-                <p class="text-lg text-gray-700 dark:text-gray-300">Formation Évacuation Incendie</p>
+                <p class="text-lg text-gray-700 dark:text-gray-300">Chasse au Trésor SST</p>
             </div>
 
             <div class="glass-morphism rounded-3xl shadow-2xl p-8 bounce-in" style="animation-delay: 0.2s">
@@ -277,13 +276,13 @@
         <!-- Page de connexion (Superviseur) -->
         <div id="login-screen" class="hidden max-w-4xl mx-auto">
             <div class="text-center mb-8 bounce-in">
-                <h1 class="text-5xl md:text-7xl font-bold neon-text text-primary mb-4">🔥 Évacuation Incendie</h1>
-                <p class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 font-semibold">Formation Interactive</p>
+                <h1 class="text-5xl md:text-7xl font-bold neon-text text-primary mb-4">🏆 Chasse au Trésor SST</h1>
+                <p class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 font-semibold">Formation Multijoueur</p>
             </div>
 
             <div class="max-w-md mx-auto mb-6">
                 <div class="glass-morphism rounded-3xl shadow-2xl p-8 text-center bounce-in" style="animation-delay: 0.2s">
-                    <div class="text-6xl mb-4">👨‍🏫</div>
+                    <div class="text-6xl mb-4">👨🏫</div>
                     <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Superviseur</h2>
                     <p class="text-gray-600 dark:text-gray-400 mb-6">Suivez la progression de tous les groupes en temps réel</p>
                     <button id="supervisor-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xl font-bold py-4 rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all">
@@ -306,8 +305,8 @@
         <!-- Page de connexion (Joueur - accessible via QR code) -->
         <div id="player-entry-screen" class="hidden max-w-4xl mx-auto">
             <div class="text-center mb-8 bounce-in">
-                <h1 class="text-5xl md:text-7xl font-bold neon-text text-primary mb-4">🔥 Évacuation Incendie</h1>
-                <p class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 font-semibold">Formation Interactive</p>
+                <h1 class="text-5xl md:text-7xl font-bold neon-text text-primary mb-4">🏆 Chasse au Trésor SST</h1>
+                <p class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 font-semibold">Formation Multijoueur</p>
             </div>
 
             <div class="max-w-md mx-auto">
@@ -328,11 +327,8 @@
         <!-- Tableau de bord Superviseur -->
         <div id="supervisor-screen" class="hidden max-w-full mx-auto">
             <div class="text-center mb-6">
-                <h1 class="text-4xl md:text-5xl font-bold text-primary neon-text mb-2">👨‍🏫 Tableau de Bord Superviseur</h1>
+                <h1 class="text-4xl md:text-5xl font-bold text-primary neon-text mb-2">👨🏫 Tableau de Bord Superviseur</h1>
                 <p class="text-lg text-gray-600 dark:text-gray-400">Progression en temps réel</p>
-                <div class="mt-2 text-xs text-gray-500 dark:text-gray-500 font-mono">
-                    Session: <span id="training-session-display"></span>
-                </div>
                 <div class="mt-4 flex flex-wrap justify-center gap-3">
                     <button id="back-to-login-supervisor" class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold transition-all">
                         ← Retour
@@ -370,17 +366,15 @@
             </div>
 
             <!-- Barres de progression verticales -->
-            <div id="teams-progress-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-8">
+            <div id="teams-progress-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                 <!-- Les barres seront générées ici -->
             </div>
 
-            <!-- Classement en temps réel (provisoire puis final) -->
-            <div id="supervisor-ranking" class="mt-8 glass-morphism rounded-3xl shadow-2xl p-8">
-                <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-6">
-                    <span id="ranking-title">🏆 Classement Provisoire</span>
-                </h2>
-                <div id="supervisor-ranking-list" class="space-y-3">
-                    <div class="text-center text-gray-500 dark:text-gray-400">En attente des équipes...</div>
+            <!-- Classement final -->
+            <div id="final-ranking" class="hidden mt-8 glass-morphism rounded-3xl shadow-2xl p-8">
+                <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-6">🏆 Classement Final</h2>
+                <div id="ranking-list" class="space-y-4">
+                    <!-- Le classement sera généré ici -->
                 </div>
             </div>
         </div>
@@ -391,15 +385,15 @@
                 <div class="inline-block glass-morphism px-6 py-3 rounded-full mb-4">
                     <span class="text-xl font-bold text-primary" id="team-name-display"></span>
                 </div>
-                <h1 class="text-4xl md:text-5xl font-bold text-primary neon-text mb-4">🔥 Modules Évacuation Incendie</h1>
+                <h1 class="text-4xl md:text-5xl font-bold text-primary neon-text mb-4">🎁 Les Coffres au Trésor SST</h1>
                 <div class="flex justify-center items-center gap-6 flex-wrap">
                     <div class="text-center">
                         <div class="text-4xl font-bold text-primary" id="total-score-display">0</div>
                         <div class="text-sm text-gray-600 dark:text-gray-400">Points Totaux</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-4xl font-bold text-green-600" id="boxes-unlocked">0/4</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">Modules Complétés</div>
+                        <div class="text-4xl font-bold text-green-600" id="boxes-unlocked">0/8</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Coffres Ouverts</div>
                     </div>
                     <button id="toggle-music-btn" class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg font-semibold transition-all shadow-lg">
                         🎵 Musique ON
@@ -633,9 +627,6 @@
                                 <button id="admin-save-btn" class="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all shadow-lg">
                                     💾 Enregistrer les modifications
                                 </button>
-                                <button id="admin-delete-btn" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all">
-                                    🗑️ Supprimer
-                                </button>
                                 <button id="admin-cancel-btn" class="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold transition-all">
                                     ❌ Annuler
                                 </button>
@@ -768,8 +759,8 @@ async function hashPassword(password) {
     return hashHex;
 }
 
-// Hash du mot de passe correct (MiBEVAC)
-const CORRECT_PASSWORD_HASH = 'de3e8fd61e93845c66a2c25f4bb3e0e0098cafea9ac85a71e4ff7a6df4a1d923';
+// Hash du mot de passe correct (MibQuizSST)
+const CORRECT_PASSWORD_HASH = 'd765abcf8ac3fd0f0a6628252442e86958246badd5e320ffe2f731e540c7cc3b';
 
 // Variable globale pour l'authentification (en mémoire uniquement)
 let isUserAuthenticated = false;
@@ -779,14 +770,6 @@ function checkAuthentication() {
     // Vérifier d'abord si c'est un accès joueur via QR code
     const urlParams = new URLSearchParams(window.location.search);
     const mode = urlParams.get('mode');
-    const sessionParam = urlParams.get('session');
-
-    // Si un sessionId est fourni dans l'URL, l'utiliser
-    if (sessionParam) {
-        trainingSessionId = sessionParam;
-        sessionId = trainingSessionId;
-        console.log('🔗 Utilisation du trainingSessionId depuis l\'URL:', trainingSessionId);
-    }
 
     if (mode === 'player') {
         // Accès joueur direct via QR code - pas besoin de mot de passe
@@ -869,11 +852,8 @@ const firebaseConfig = {
 // Variables Firebase
 let database = null;
 // Session ID global partagé par toutes les équipes d'une même formation
-// Le trainingSessionId est commun à toute la formation, tandis que teamId est unique par équipe
-let trainingSessionId = 'training_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-// Le teamId sera généré à partir du nom de l'équipe quand elle se connecte
-let teamId = null;
-let sessionId = trainingSessionId; // Pour compatibilité avec le code existant
+// Utilisé pour coordonner les étapes entre équipes
+let sessionId = 'formation_' + new Date().toISOString().split('T')[0]; // Format: formation_2025-01-15
 
 // Initialiser Firebase (après le chargement de la page)
 function initializeFirebase() {
@@ -893,7 +873,7 @@ function initializeFirebase() {
         firebase.initializeApp(firebaseConfig);
         database = firebase.database();
         console.log('✅ Firebase initialisé avec succès');
-        console.log('🆔 Session de formation:', trainingSessionId);
+        console.log('🆔 Session de formation:', sessionId);
         console.log('🔗 Database URL:', firebaseConfig.databaseURL);
 
         // Test de connexion
@@ -904,22 +884,6 @@ function initializeFirebase() {
                 console.log('📡 Déconnecté de Firebase');
             }
         });
-
-        // Charger les données modifiées depuis Firebase (si elles existent)
-        loadBoxesDataFromFirebase()
-            .then(loadedData => {
-                if (loadedData) {
-                    boxesData.length = 0;
-                    boxesData.push(...loadedData);
-                    console.log('🎮 Données du jeu chargées depuis Firebase');
-                } else {
-                    console.log('🎮 Utilisation des données par défaut');
-                }
-            })
-            .catch(error => {
-                console.error('❌ Erreur chargement données:', error);
-                console.log('🎮 Utilisation des données par défaut');
-            });
 
         return true;
     } catch (error) {
@@ -943,16 +907,20 @@ let currentTeamName = '';
 // Stockage des équipes (pour le superviseur)
 let teams = {};
 
-// SYSTÈME D'ÉTAPES (2 étapes de 2 coffres chacune)
-let currentStage = 1; // Étape actuelle (1 à 2)
+// SYSTÈME D'ÉTAPES (4 étapes de 2 coffres chacune)
+let currentStage = 1; // Étape actuelle (1 à 4)
 let gamePaused = false; // Le jeu est-il en pause ?
 let stageWinners = {
     stage1: null,
-    stage2: null
+    stage2: null,
+    stage3: null,
+    stage4: null
 };
 
 // Fonction pour calculer l'étape en fonction des coffres déverrouillés
 function getStageFromBoxes(boxesUnlocked) {
+    if (boxesUnlocked >= 8) return 4;
+    if (boxesUnlocked >= 6) return 3;
     if (boxesUnlocked >= 4) return 2;
     if (boxesUnlocked >= 2) return 1;
     return 0; // Pas encore d'étape complétée
@@ -1060,31 +1028,6 @@ function playSound(type, frequency = null) {
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.1);
             break;
-        case 'applause':
-            // Son de fanfare festive (comme une célébration)
-            // Séquence de notes joyeuses répétées
-            const celebrationNotes = [
-                { freq: 523.25, time: 0 },      // C5
-                { freq: 659.25, time: 0.12 },   // E5
-                { freq: 783.99, time: 0.24 },   // G5
-                { freq: 1046.50, time: 0.36 },  // C6
-                { freq: 783.99, time: 0.5 },    // G5
-                { freq: 1046.50, time: 0.62 }   // C6
-            ];
-
-            celebrationNotes.forEach(note => {
-                const osc = audioContext.createOscillator();
-                const gain = audioContext.createGain();
-                osc.connect(gain);
-                gain.connect(audioContext.destination);
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(note.freq, audioContext.currentTime + note.time);
-                gain.gain.setValueAtTime(0.2, audioContext.currentTime + note.time);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + note.time + 0.15);
-                osc.start(audioContext.currentTime + note.time);
-                osc.stop(audioContext.currentTime + note.time + 0.15);
-            });
-            return; // Ne pas exécuter le code oscillator par défaut
     }
 }
 
@@ -1636,298 +1579,1329 @@ function createChestOpenEffect(element) {
 
 // ==================== DONNÉES DU JEU ====================
 
-// Données par défaut du jeu
-const defaultBoxesData = [
+const boxesData = [
     {
-        title: 'Coffre 1 - Alarme & Alerte',
-        subtitle: 'Réagir en cas d\'incendie',
-        icon: '🚨',
-        color: 'from-red-500 to-orange-600',
+        title: 'DC1 - Protéger',
+        subtitle: 'Situer son rôle de SST',
+        icon: '🛡️',
+        color: 'from-blue-500 to-blue-700',
         games: [
+            // Jeu 1 avec 8 variations
             [
                 {
                     type: 'quiz',
-                    title: 'Alarme Incendie',
-                    question: 'Que devez-vous faire en PREMIER quand vous découvrez un début d\'incendie ?',
+                    title: 'DC1.1 - Cadre juridique du SST',
+                    question: 'Quel est le cadre juridique qui définit le rôle du Sauveteur Secouriste du Travail en France ?',
                     options: [
-                        'Evacuer immédiatement',
-                        'Déclencher l\'alarme incendie',
-                        'Prendre un extincteur',
-                        'Appeler les pompiers'
+                        'Le Code du Travail (Article R4224-15)',
+                        'Le Code Civil',
+                        'Le Code de la Santé Publique',
+                        'Le Règlement Intérieur de l\'entreprise'
+                    ],
+                    correctAnswer: 0,
+                    timeLimit: 60,
+                    points: 100
+                },
+                {
+                    type: 'quiz',
+                    title: 'DC1.1 - Rôle du SST',
+                    question: 'Quel est le rôle principal d\'un SST sur son lieu de travail ?',
+                    options: [
+                        'Remplacer les services d\'urgence',
+                        'Porter les premiers secours et prévenir les risques',
+                        'Soigner toutes les blessures',
+                        'Evacuer les victimes'
                     ],
                     correctAnswer: 1,
                     timeLimit: 60,
                     points: 100
                 },
                 {
-                    type: 'quiz',
-                    title: 'Numéros d\'urgence',
-                    question: 'Quel est le numéro d\'appel des pompiers en France ?',
+                    type: 'quiz-multi',
+                    title: 'DC1.1 - Missions du SST',
+                    question: 'Quelles sont les missions d\'un SST ? (Plusieurs réponses)',
                     options: [
-                        '15',
-                        '17',
-                        '18',
-                        '112'
+                        'Protéger',
+                        'Examiner',
+                        'Prescrire des médicaments',
+                        'Faire alerter',
+                        'Secourir',
+                        'Transporter la victime'
                     ],
-                    correctAnswer: 2,
-                    timeLimit: 45,
-                    points: 90
+                    correctAnswers: [0, 1, 3, 4],
+                    timeLimit: 70,
+                    points: 120
                 },
                 {
-                    type: 'quiz-multi',
-                    title: 'Informations à donner',
-                    question: 'Quelles informations devez-vous donner aux pompiers ? (Plusieurs réponses)',
-                    options: [
-                        'Votre nom',
-                        'L\'adresse précise',
-                        'Le nombre de personnes présentes',
-                        'La nature du feu',
-                        'Votre numéro de sécurité sociale',
-                        'Si des personnes sont en danger'
-                    ],
-                    correctAnswers: [0, 1, 3, 5],
-                    timeLimit: 75,
-                    points: 130
-                }
-            ],
-            {
-                type: 'true-false',
-                title: 'Alarme vs Alerte',
-                question: 'L\'alarme incendie et l\'alerte aux pompiers sont la même chose.',
-                options: ['Vrai', 'Faux'],
-                correctAnswer: 1,
-                explanation: 'FAUX - L\'alarme est le signal sonore qui prévient les occupants du bâtiment. L\'alerte est l\'appel aux secours (pompiers). Les deux actions sont distinctes et complémentaires.',
-                timeLimit: 50,
-                points: 95
-            },
-            {
-                type: 'sequence',
-                title: 'Ordre des actions',
-                question: 'Remettez dans l\'ordre les actions à effectuer en cas d\'incendie :',
-                items: [
-                    'Déclencher l\'alarme',
-                    'Appeler les pompiers (18)',
-                    'Evacuer si possible',
-                    'Fermer les portes'
-                ],
-                correctOrder: [0, 1, 3, 2],
-                timeLimit: 70,
-                points: 120
-            }
-        ]
-    },
-    {
-        title: 'Coffre 2 - Évacuation',
-        subtitle: 'Sortir en sécurité',
-        icon: '🏃',
-        color: 'from-orange-500 to-red-600',
-        games: [
-            [
-                {
                     type: 'quiz',
-                    title: 'Signalisation',
-                    question: 'Quelle est la couleur des panneaux de sortie de secours ?',
+                    title: 'DC1.1 - Formation SST',
+                    question: 'Quelle est la durée de validité d\'un certificat SST ?',
                     options: [
-                        'Rouge',
-                        'Vert',
-                        'Bleu',
-                        'Jaune'
+                        '1 an',
+                        '2 ans',
+                        '3 ans',
+                        '5 ans'
                     ],
                     correctAnswer: 1,
-                    timeLimit: 45,
-                    points: 90
+                    timeLimit: 50,
+                    points: 100
                 },
                 {
                     type: 'quiz',
-                    title: 'Chemin d\'évacuation',
-                    question: 'Que ne faut-il JAMAIS faire lors d\'une évacuation ?',
+                    title: 'DC1.1 - Nombre de SST',
+                    question: 'Combien de SST minimum doit-on avoir dans une entreprise de moins de 20 salariés ?',
                     options: [
-                        'Suivre les panneaux de sortie',
-                        'Prendre l\'ascenseur',
-                        'Fermer les portes derrière soi',
-                        'Se diriger vers le point de rassemblement'
+                        'Aucun',
+                        '1 SST',
+                        '2 SST',
+                        '5% de l\'effectif'
                     ],
                     correctAnswer: 1,
                     timeLimit: 55,
                     points: 100
                 },
                 {
-                    type: 'quiz',
-                    title: 'Fumées toxiques',
-                    question: 'Comment devez-vous vous déplacer dans un local enfumé ?',
-                    options: [
-                        'En marchant normalement',
-                        'En courant le plus vite possible',
-                        'En rampant au sol',
-                        'En retenant votre respiration'
-                    ],
-                    correctAnswer: 2,
-                    timeLimit: 60,
-                    points: 100
-                },
-                {
                     type: 'quiz-multi',
-                    title: 'Règles d\'évacuation',
-                    question: 'Quelles sont les bonnes pratiques lors d\'une évacuation ? (Plusieurs réponses)',
+                    title: 'DC1.1 - Obligations du SST',
+                    question: 'Quelles sont les obligations du SST ? (Plusieurs réponses)',
                     options: [
-                        'Rester calme',
-                        'Ne pas revenir en arrière',
-                        'Prendre ses affaires personnelles',
-                        'Aider les personnes en difficulté',
-                        'Utiliser l\'ascenseur',
-                        'Fermer les portes'
+                        'Intervenir immédiatement en cas d\'accident',
+                        'Se recycler tous les 2 ans',
+                        'Remplacer le médecin du travail',
+                        'Connaître les risques de l\'entreprise',
+                        'Prodiguer les premiers secours'
                     ],
-                    correctAnswers: [0, 1, 3, 5],
+                    correctAnswers: [0, 1, 3, 4],
                     timeLimit: 75,
                     points: 130
-                }
-            ],
-            {
-                type: 'true-false',
-                title: 'Point de rassemblement',
-                question: 'Après l\'évacuation, vous devez retourner chercher vos affaires une fois le calme revenu.',
-                options: ['Vrai', 'Faux'],
-                correctAnswer: 1,
-                explanation: 'FAUX - Il ne faut JAMAIS retourner dans le bâtiment avant l\'autorisation des pompiers. Attendez au point de rassemblement les instructions des secours.',
-                timeLimit: 50,
-                points: 95
-            },
-            {
-                type: 'matching',
-                title: 'Symboles de sécurité',
-                question: 'Associez chaque symbole à sa signification :',
-                pairs: [
-                    { left: 'Panneau vert avec flèche', right: 'Sortie de secours' },
-                    { left: 'Panneau rouge', right: 'Interdiction' },
-                    { left: 'Panneau bleu', right: 'Obligation' },
-                    { left: 'Point de rassemblement', right: 'Lieu de regroupement' }
-                ],
-                timeLimit: 80,
-                points: 120
-            }
-        ]
-    },
-    {
-        title: 'Coffre 3 - Moyens de Lutte',
-        subtitle: 'Utiliser un extincteur',
-        icon: '🧯',
-        color: 'from-red-600 to-pink-600',
-        games: [
-            [
+                },
                 {
                     type: 'quiz',
-                    title: 'Types d\'extincteurs',
-                    question: 'Quel extincteur est adapté pour un feu d\'origine électrique ?',
+                    title: 'DC1.1 - Responsabilité',
+                    question: 'Un SST peut-il être poursuivi pour non-assistance à personne en danger ?',
                     options: [
-                        'Extincteur à eau pulvérisée',
-                        'Extincteur à mousse',
-                        'Extincteur CO2',
-                        'Extincteur à poudre ABC'
+                        'Non, jamais',
+                        'Oui, comme tout citoyen',
+                        'Seulement durant ses heures de travail',
+                        'Seulement s\'il est diplômé'
                     ],
-                    correctAnswer: 2,
+                    correctAnswer: 1,
                     timeLimit: 60,
                     points: 110
                 },
                 {
                     type: 'quiz',
-                    title: 'Classes de feu',
-                    question: 'Un feu de papier et de bois est de classe :',
+                    title: 'DC1.1 - Prévention',
+                    question: 'En plus des secours, quel est l\'autre rôle majeur du SST ?',
                     options: [
-                        'Classe A',
-                        'Classe B',
-                        'Classe C',
-                        'Classe D'
+                        'Nettoyer les lieux de l\'accident',
+                        'Participer à la prévention des risques',
+                        'Former les autres salariés',
+                        'Gérer la trousse de secours'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 55,
+                    points: 100
+                },
+                {
+                    type: 'true-false',
+                    title: 'DC1.1 - Vrai ou Faux',
+                    question: 'Un SST peut administrer des médicaments à une victime.',
+                    options: ['Vrai', 'Faux'],
+                    correctAnswer: 1,
+                    explanation: 'FAUX - Un SST ne peut jamais administrer de médicaments. C\'est un acte médical réservé aux professionnels de santé.',
+                    timeLimit: 45,
+                    points: 90
+                },
+                {
+                    type: 'true-false',
+                    title: 'DC1.1 - Vrai ou Faux',
+                    question: 'Le certificat SST doit être recyclé tous les 2 ans.',
+                    options: ['Vrai', 'Faux'],
+                    correctAnswer: 0,
+                    explanation: 'VRAI - Le recyclage SST doit avoir lieu tous les 24 mois pour maintenir la validité du certificat.',
+                    timeLimit: 45,
+                    points: 90
+                }
+            ],
+            // Nouveaux jeux Vrai/Faux
+            {
+                type: 'true-false',
+                title: 'DC1.1 - Vrai ou Faux',
+                question: 'Le SST doit toujours rester sur les lieux jusqu\'à l\'arrivée des secours spécialisés.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 0,
+                explanation: 'VRAI - Le SST doit rester avec la victime et maintenir les gestes de secours jusqu\'à la prise en charge par les secours spécialisés.',
+                timeLimit: 45,
+                points: 90
+            },
+            {
+                type: 'true-false',
+                title: 'DC1.1 - Vrai ou Faux',
+                question: 'Le SST peut utiliser n\'importe quel matériel médical disponible dans l\'entreprise.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 1,
+                explanation: 'FAUX - Le SST ne peut utiliser que le matériel pour lequel il est formé (DAE, trousse de secours basique). Il ne peut pas utiliser de matériel médical spécialisé.',
+                timeLimit: 50,
+                points: 95
+            },
+            // Jeu 2 avec 6 variations
+            [
+                {
+                    type: 'matching',
+                    title: 'DC1.2 - Délimiter son champ d\'intervention',
+                    question: 'Associez chaque action avec le bon intervenant :',
+                    pairs: [
+                        { left: 'Porter les premiers secours', right: 'SST' },
+                        { left: 'Prescrire un traitement médical', right: 'Médecin' },
+                        { left: 'Protéger et alerter', right: 'SST' },
+                        { left: 'Transporter la victime à l\'hôpital', right: 'Secours spécialisés' }
+                    ],
+                    timeLimit: 90,
+                    points: 120
+                },
+                {
+                    type: 'quiz',
+                    title: 'DC1.2 - Limite d\'intervention du SST',
+                    question: 'Quelle est la limite d\'intervention du SST ?',
+                    options: [
+                        'Jusqu\'à l\'arrivée des secours spécialisés',
+                        'Jusqu\'à la guérison complète',
+                        'Pendant 24 heures',
+                        'Il n\'y a pas de limite'
+                    ],
+                    correctAnswer: 0,
+                    timeLimit: 70,
+                    points: 110
+                },
+                {
+                    type: 'matching',
+                    title: 'DC1.2 - Rôles et responsabilités',
+                    question: 'Associez chaque intervenant à sa responsabilité :',
+                    pairs: [
+                        { left: 'Réanimation cardio-pulmonaire', right: 'SST' },
+                        { left: 'Diagnostic médical', right: 'Médecin' },
+                        { left: 'Transport médicalisé', right: 'SMUR' },
+                        { left: 'Mise en sécurité', right: 'SST' }
+                    ],
+                    timeLimit: 85,
+                    points: 120
+                },
+                {
+                    type: 'quiz',
+                    title: 'DC1.2 - Matériel SST',
+                    question: 'Le SST peut-il utiliser un défibrillateur automatisé externe (DAE) ?',
+                    options: [
+                        'Non, il faut une formation spécifique',
+                        'Oui, tout citoyen peut l\'utiliser',
+                        'Seulement les pompiers',
+                        'Uniquement sur prescription médicale'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 60,
+                    points: 100
+                },
+                {
+                    type: 'sequence',
+                    title: 'DC1.2 - Chaîne de secours',
+                    question: 'Remettez dans l\'ordre les étapes de la chaîne de secours :',
+                    items: [
+                        'Protéger',
+                        'Examiner',
+                        'Faire alerter / Alerter',
+                        'Secourir'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 65,
+                    points: 120
+                },
+                {
+                    type: 'puzzle-text',
+                    title: 'DC1.2 - Conduites à tenir',
+                    question: 'Reconstituez les 4 grandes actions du SST dans le bon ordre :',
+                    pieces: [
+                        '1. Protéger',
+                        '2. Examiner',
+                        '3. Faire alerter ou alerter',
+                        '4. Secourir'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 70,
+                    points: 120
+                }
+            ]
+        ]
+    },
+    {
+        title: 'DC1 - Protéger',
+        subtitle: 'Protéger de façon adaptée',
+        icon: '⚠️',
+        color: 'from-red-500 to-red-700',
+        games: [
+            // Jeu 1 avec 6 variations
+            [
+                {
+                    type: 'sequence',
+                    title: 'Partie 2 - Reconnaître les dangers',
+                    question: 'Remettez dans l\'ordre les étapes pour reconnaître les dangers persistants :',
+                    items: [
+                        'Observer la situation',
+                        'Identifier les dangers',
+                        'Repérer les personnes exposées',
+                        'Imaginer les accidents possibles'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'quiz-multi',
+                    title: 'Partie 2 - Dangers persistants',
+                    question: 'Quels sont les dangers persistants qui nécessitent une protection ? (Plusieurs réponses)',
+                    options: [
+                        'Risque électrique',
+                        'Risque d\'incendie ou d\'explosion',
+                        'Risque d\'écrasement',
+                        'Victime qui tousse',
+                        'Atmosphère toxique',
+                        'Risque routier'
+                    ],
+                    correctAnswers: [0, 1, 2, 4, 5],
+                    timeLimit: 80,
+                    points: 140
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 2 - Protection électrique',
+                    question: 'Face à un danger électrique, que devez-vous faire EN PREMIER ?',
+                    options: [
+                        'Tirer la victime par les vêtements',
+                        'Couper le courant',
+                        'Appeler les pompiers',
+                        'Faire un massage cardiaque'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 55,
+                    points: 100
+                },
+                {
+                    type: 'matching',
+                    title: 'Partie 2 - Types de dangers',
+                    question: 'Associez chaque danger à sa catégorie :',
+                    pairs: [
+                        { left: 'Câble électrique dénudé', right: 'Risque électrique' },
+                        { left: 'Fuite de gaz', right: 'Risque d\'explosion' },
+                        { left: 'Véhicule en marche', right: 'Risque d\'écrasement' },
+                        { left: 'Fumée dense', right: 'Atmosphère toxique' }
+                    ],
+                    timeLimit: 90,
+                    points: 130
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 2 - Périmètre de sécurité',
+                    question: 'Pourquoi faut-il délimiter un périmètre de sécurité ?',
+                    options: [
+                        'Pour empêcher les curieux',
+                        'Pour éviter le sur-accident',
+                        'Pour impressionner les secours',
+                        'Pour isoler la victime'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 60,
+                    points: 100
+                },
+                {
+                    type: 'quiz-illustrated',
+                    illustrationFunction: 'getTriangleSVG',
+                    title: 'Partie 2 - Schéma de protection',
+                    question: 'À quelle distance minimum doit-on placer le triangle de présignalisation en cas d\'accident ?',
+                    options: [
+                        '10 mètres',
+                        '20 mètres',
+                        '30 mètres',
+                        '50 mètres'
+                    ],
+                    correctAnswer: 2,
+                    timeLimit: 70,
+                    points: 110
+                }
+            ],
+            // Nouveaux jeux Vrai/Faux - Protéger
+            {
+                type: 'true-false',
+                title: 'Partie 2 - Vrai ou Faux',
+                question: 'On peut déplacer une victime dans tous les cas pour la mettre en sécurité.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 1,
+                explanation: 'FAUX - On ne déplace une victime que si un danger vital, immédiat et impossible à supprimer menace. Le déplacement peut aggraver les lésions.',
+                timeLimit: 50,
+                points: 95
+            },
+            {
+                type: 'true-false',
+                title: 'Partie 2 - Vrai ou Faux',
+                question: 'Le triangle de signalisation doit être placé à au moins 30 mètres en amont de l\'accident.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 0,
+                explanation: 'VRAI - Le triangle de présignalisation doit être placé à minimum 30 mètres (distance de visibilité) pour permettre aux autres véhicules de ralentir à temps.',
+                timeLimit: 45,
+                points: 90
+            },
+            {
+                type: 'true-false',
+                title: 'Partie 2 - Vrai ou Faux',
+                question: 'La protection du sauveteur passe avant celle de la victime.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 0,
+                explanation: 'VRAI - Le sauveteur doit d\'abord assurer sa propre sécurité. Un sauveteur blessé ne peut plus porter secours et devient une victime supplémentaire.',
+                timeLimit: 50,
+                points: 95
+            },
+            // Jeu 2 avec 5 variations
+            [
+                {
+                    type: 'quiz-multi',
+                    title: 'Partie 2 - Actions de protection',
+                    question: 'Quelles actions permettent de protéger ? (Plusieurs réponses)',
+                    options: [
+                        'Couper le courant',
+                        'Baliser la zone',
+                        'Déplacer la victime immédiatement',
+                        'Fermer l\'arrivée de gaz',
+                        'Faire évacuer la zone',
+                        'Donner à boire à la victime'
+                    ],
+                    correctAnswers: [0, 1, 3, 4],
+                    timeLimit: 85,
+                    points: 140
+                },
+                {
+                    type: 'sequence',
+                    title: 'Partie 2 - Protéger sur la route',
+                    question: 'Ordre des actions pour protéger sur un accident de la route :',
+                    items: [
+                        'Allumer les feux de détresse',
+                        'Mettre le gilet haute visibilité',
+                        'Placer le triangle 30m en amont',
+                        'Faire évacuer les victimes valides'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 2 - Dégagement d\'urgence',
+                    question: 'Quand peut-on déplacer une victime ?',
+                    options: [
+                        'Toujours, pour la mettre à l\'aise',
+                        'Jamais, il faut attendre les secours',
+                        'Uniquement si un danger vital immédiat et impossible à supprimer menace',
+                        'Dès qu\'elle saigne'
+                    ],
+                    correctAnswer: 2,
+                    timeLimit: 70,
+                    points: 120
+                },
+                {
+                    type: 'matching',
+                    title: 'Partie 2 - Moyens de protection',
+                    question: 'Associez chaque danger à son moyen de protection :',
+                    pairs: [
+                        { left: 'Incendie', right: 'Extincteur / Évacuation' },
+                        { left: 'Électricité', right: 'Coupure du courant' },
+                        { left: 'Gaz', right: 'Fermeture vanne + aération' },
+                        { left: 'Accident route', right: 'Triangle + balisage' }
+                    ],
+                    timeLimit: 90,
+                    points: 130
+                },
+                {
+                    type: 'puzzle-text',
+                    title: 'Partie 2 - Ordre de priorité',
+                    question: 'Reconstituez l\'ordre de priorité dans la protection :',
+                    pieces: [
+                        '1. Se protéger soi-même',
+                        '2. Protéger les autres',
+                        '3. Protéger la victime',
+                        '4. Supprimer ou isoler le danger'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 75,
+                    points: 130
+                }
+            ]
+        ]
+    },
+    {
+        title: 'DC2 - Examiner',
+        subtitle: 'Examiner la victime',
+        icon: '🔍',
+        color: 'from-green-500 to-green-700',
+        games: [
+            // Jeu 1 avec 6 variations
+            [
+                {
+                    type: 'sequence',
+                    title: 'Partie 2.1 - Ordre d\'examen',
+                    question: 'Dans quel ordre examinez-vous une victime ?',
+                    items: [
+                        'Vérifier la conscience',
+                        'Vérifier la respiration',
+                        'Rechercher une hémorragie',
+                        'Rechercher d\'autres signes'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 70,
+                    points: 120
+                },
+                {
+                    type: 'matching',
+                    title: 'Partie 2.1 - Signes et symptômes',
+                    question: 'Associez chaque signe avec sa catégorie :',
+                    pairs: [
+                        { left: 'Victime ne répond pas', right: 'Inconscience' },
+                        { left: 'Ventre ou thorax qui se soulève', right: 'Respiration présente' },
+                        { left: 'Saignement abondant', right: 'Hémorragie externe' },
+                        { left: 'Brûlure, plaie, douleur', right: 'Autres signes' }
+                    ],
+                    timeLimit: 85,
+                    points: 130
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 2.1 - Conscience',
+                    question: 'Comment vérifier la conscience d\'une victime ?',
+                    options: [
+                        'Lui poser une question simple et secouer doucement les épaules',
+                        'La gifler',
+                        'Lui verser de l\'eau froide',
+                        'Attendre qu\'elle se réveille'
+                    ],
+                    correctAnswer: 0,
+                    timeLimit: 60,
+                    points: 100
+                },
+                {
+                    type: 'quiz-multi',
+                    title: 'Partie 2.1 - Respiration',
+                    question: 'Comment vérifier si une victime respire ? (Plusieurs méthodes)',
+                    options: [
+                        'Voir si le ventre/thorax se soulève',
+                        'Sentir le souffle sur la joue',
+                        'Écouter les bruits respiratoires',
+                        'Prendre le pouls',
+                        'Regarder la couleur des lèvres',
+                        'Mettre un miroir sous le nez'
+                    ],
+                    correctAnswers: [0, 1, 2],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 2.1 - Hémorragie',
+                    question: 'Qu\'est-ce qu\'une hémorragie externe ?',
+                    options: [
+                        'Un saignement visible qui ne s\'arrête pas',
+                        'Un hématome',
+                        'Une égratignure',
+                        'Un saignement de nez'
+                    ],
+                    correctAnswer: 0,
+                    timeLimit: 55,
+                    points: 100
+                },
+                {
+                    type: 'quiz-illustrated',
+                    illustrationFunction: 'getLVASVG',
+                    title: 'Partie 2.1 - Position LVA',
+                    question: 'Comment libère-t-on les voies aériennes avant de vérifier la respiration ?',
+                    options: [
+                        'Une main sur le front, l\'autre sous le menton, et basculer la tête en arrière',
+                        'Tourner la tête sur le côté',
+                        'Soulever les épaules',
+                        'Mettre un oreiller sous la tête'
+                    ],
+                    correctAnswer: 0,
+                    timeLimit: 70,
+                    points: 110
+                }
+            ],
+            // Nouveaux jeux Vrai/Faux - Examiner
+            {
+                type: 'true-false',
+                title: 'Partie 2.1 - Vrai ou Faux',
+                question: 'Pour vérifier la respiration, il suffit de prendre le pouls de la victime.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 1,
+                explanation: 'FAUX - La prise de pouls n\'est pas fiable pour vérifier la respiration. Il faut utiliser la méthode VES (Voir, Écouter, Sentir) pendant 10 secondes.',
+                timeLimit: 50,
+                points: 95
+            },
+            {
+                type: 'true-false',
+                title: 'Partie 2.1 - Vrai ou Faux',
+                question: 'Une victime inconsciente qui respire doit être mise en Position Latérale de Sécurité (PLS).',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 0,
+                explanation: 'VRAI - La PLS permet d\'éviter l\'obstruction des voies aériennes par la langue ou les liquides (vomissements, sang) chez une victime inconsciente qui respire.',
+                timeLimit: 50,
+                points: 95
+            },
+            {
+                type: 'true-false',
+                title: 'Partie 2.1 - Vrai ou Faux',
+                question: 'L\'examen de la victime doit toujours commencer par la recherche d\'une hémorragie.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 1,
+                explanation: 'FAUX - L\'examen commence toujours par la vérification de la conscience, puis de la respiration, et ensuite la recherche d\'une hémorragie externe.',
+                timeLimit: 50,
+                points: 95
+            },
+            // Jeu 2 avec 5 variations
+            [
+                {
+                    type: 'sequence',
+                    title: 'Partie 2.1 - Bilan vital',
+                    question: 'Ordre des vérifications pour le bilan vital :',
+                    items: [
+                        'Parler à la victime',
+                        'Libérer les voies aériennes',
+                        'Vérifier la respiration 10 secondes',
+                        'Rechercher une hémorragie visible'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 70,
+                    points: 120
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 2.1 - Signes de détresse',
+                    question: 'Quel signe indique une détresse vitale immédiate ?',
+                    options: [
+                        'Une petite plaie au doigt',
+                        'L\'absence de respiration',
+                        'Une douleur au genou',
+                        'Une légère brûlure'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 55,
+                    points: 100
+                },
+                {
+                    type: 'matching',
+                    title: 'Partie 2.1 - État de conscience',
+                    question: 'Associez chaque réponse à l\'état de conscience :',
+                    pairs: [
+                        { left: 'Répond à la question', right: 'Consciente' },
+                        { left: 'Ouvre les yeux au bruit', right: 'Semi-consciente' },
+                        { left: 'Aucune réaction', right: 'Inconsciente' },
+                        { left: 'Parle de manière confuse', right: 'Consciente altérée' }
+                    ],
+                    timeLimit: 85,
+                    points: 130
+                },
+                {
+                    type: 'puzzle-text',
+                    title: 'Partie 2.1 - Méthode Ver Écouter Sentir',
+                    question: 'Reconstituez la méthode VES (Voir Écouter Sentir) :',
+                    pieces: [
+                        '1. Basculer doucement la tête en arrière',
+                        '2. VOIR le ventre/thorax se soulever',
+                        '3. ÉCOUTER les bruits respiratoires',
+                        '4. SENTIR le souffle sur la joue'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'quiz-multi',
+                    title: 'Partie 2.1 - Autres signes',
+                    question: 'Quels autres signes devez-vous rechercher ? (Plusieurs réponses)',
+                    options: [
+                        'Plaies',
+                        'Brûlures',
+                        'Déformations',
+                        'Couleur des cheveux',
+                        'Douleurs',
+                        'Taille de la victime'
+                    ],
+                    correctAnswers: [0, 1, 2, 4],
+                    timeLimit: 70,
+                    points: 130
+                }
+            ]
+        ]
+    },
+    {
+        title: 'DC2 - Alerter',
+        subtitle: 'Faire alerter ou alerter',
+        icon: '📞',
+        color: 'from-yellow-500 to-orange-600',
+        games: [
+            // Jeu 1 avec 7 variations
+            [
+                {
+                    type: 'puzzle-text',
+                    title: 'Partie 6 - Message d\'alerte',
+                    question: 'Reconstituez le message d\'alerte dans le bon ordre :',
+                    pieces: [
+                        '1. Numéro de téléphone',
+                        '2. Lieu précis de l\'accident',
+                        '3. Nature de l\'accident',
+                        '4. Nombre de victimes',
+                        '5. État de chaque victime',
+                        '6. Gestes effectués'
+                    ],
+                    correctOrder: [0, 1, 2, 3, 4, 5],
+                    timeLimit: 80,
+                    points: 130
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 6 - Numéros d\'urgence',
+                    question: 'Quel numéro d\'urgence devez-vous appeler pour un accident du travail avec victime grave ?',
+                    options: [
+                        '15 - SAMU (urgence médicale)',
+                        '17 - Police',
+                        '112 - Numéro européen',
+                        'Le numéro interne de l\'entreprise uniquement'
                     ],
                     correctAnswer: 0,
                     timeLimit: 50,
                     points: 100
                 },
                 {
-                    type: 'quiz-multi',
-                    title: 'Utilisation extincteur',
-                    question: 'Quelles sont les étapes pour utiliser un extincteur ? (Plusieurs réponses)',
-                    options: [
-                        'Retirer la goupille de sécurité',
-                        'Appuyer sur la poignée',
-                        'Viser la base des flammes',
-                        'Viser le haut des flammes',
-                        'Se placer dos au vent',
-                        'Balayer de gauche à droite'
+                    type: 'matching',
+                    title: 'Partie 6 - Numéros d\'urgence',
+                    question: 'Associez chaque numéro à son service :',
+                    pairs: [
+                        { left: '15', right: 'SAMU' },
+                        { left: '18', right: 'Pompiers' },
+                        { left: '112', right: 'Numéro européen' },
+                        { left: '114', right: 'Sourds et malentendants' }
                     ],
-                    correctAnswers: [0, 1, 2, 5],
-                    timeLimit: 80,
-                    points: 140
-                }
-            ],
-            {
-                type: 'matching',
-                title: 'Classes de feu',
-                question: 'Associez chaque classe de feu à son type :',
-                pairs: [
-                    { left: 'Classe A', right: 'Feux de solides (bois, papier)' },
-                    { left: 'Classe B', right: 'Feux de liquides (essence, huile)' },
-                    { left: 'Classe C', right: 'Feux de gaz' },
-                    { left: 'Classe D', right: 'Feux de métaux' }
-                ],
-                timeLimit: 90,
-                points: 130
-            },
-            {
-                type: 'true-false',
-                title: 'Distance de sécurité',
-                question: 'On doit se placer à environ 3-4 mètres du feu pour utiliser un extincteur.',
-                options: ['Vrai', 'Faux'],
-                correctAnswer: 0,
-                explanation: 'VRAI - La distance recommandée est de 3 à 4 mètres pour être efficace tout en restant en sécurité. Trop près, vous risquez de vous brûler. Trop loin, l\'extincteur sera inefficace.',
-                timeLimit: 55,
-                points: 100
-            },
-            {
-                type: 'sequence',
-                title: 'Méthode d\'extinction',
-                question: 'Remettez dans l\'ordre les étapes d\'utilisation d\'un extincteur :',
-                items: [
-                    'Retirer la goupille',
-                    'Viser la base des flammes',
-                    'Presser la poignée',
-                    'Balayer latéralement'
-                ],
-                correctOrder: [0, 1, 2, 3],
-                timeLimit: 65,
-                points: 120
-            }
-        ]
-    },
-    {
-        title: 'Coffre 4 - Code du Travail',
-        subtitle: 'Obligations légales',
-        icon: '📋',
-        color: 'from-pink-600 to-purple-600',
-        games: [
-            [
+                    timeLimit: 75,
+                    points: 120
+                },
                 {
                     type: 'quiz',
-                    title: 'Obligation de l\'employeur',
-                    question: 'Selon le Code du Travail, quelle est l\'obligation de l\'employeur en matière d\'incendie ?',
+                    title: 'Partie 6 - Qui alerte ?',
+                    question: 'Si vous êtes seul avec une victime en arrêt cardiaque, que faites-vous ?',
                     options: [
-                        'Former uniquement les cadres',
-                        'Afficher les consignes de sécurité',
-                        'Avoir des extincteurs décoration',
-                        'Faire un exercice tous les 10 ans'
+                        'Vous restez avec la victime sans alerter',
+                        'Vous alertez les secours AVANT de commencer la réanimation',
+                        'Vous attendez de l\'aide',
+                        'Vous partez chercher un défibrillateur'
                     ],
                     correctAnswer: 1,
                     timeLimit: 65,
                     points: 110
                 },
                 {
-                    type: 'quiz',
-                    title: 'Article R4227-28',
-                    question: 'Quelle est la fréquence minimale des exercices d\'évacuation selon le Code du Travail ?',
+                    type: 'sequence',
+                    title: 'Partie 6 - Contenu de l\'alerte',
+                    question: 'Ordre des informations à donner aux secours :',
+                    items: [
+                        'Lieu exact et accès',
+                        'Nature de l\'accident',
+                        'Nombre et état des victimes',
+                        'Gestes déjà effectués'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 70,
+                    points: 120
+                },
+                {
+                    type: 'quiz-multi',
+                    title: 'Partie 6 - Informations importantes',
+                    question: 'Que devez-vous préciser lors de l\'alerte ? (Plusieurs réponses)',
                     options: [
-                        'Tous les mois',
-                        'Tous les 6 mois',
-                        'Tous les ans',
-                        'Tous les 2 ans'
+                        'L\'adresse exacte',
+                        'Votre nom',
+                        'L\'état de la victime',
+                        'La météo',
+                        'Les gestes effectués',
+                        'Votre âge'
+                    ],
+                    correctAnswers: [0, 1, 2, 4],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 6 - Fin de l\'appel',
+                    question: 'Qui raccroche en premier lors d\'un appel aux secours ?',
+                    options: [
+                        'Vous, dès que vous avez tout dit',
+                        'Le régulateur des secours',
+                        'Peu importe',
+                        'Personne, on laisse la ligne ouverte'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 55,
+                    points: 100
+                }
+            ],
+            // Nouveaux jeux Vrai/Faux - Alerter
+            {
+                type: 'true-false',
+                title: 'Partie 6 - Vrai ou Faux',
+                question: 'Le numéro 112 fonctionne dans tous les pays de l\'Union Européenne.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 0,
+                explanation: 'VRAI - Le 112 est le numéro d\'urgence européen unique. Il est gratuit et accessible partout dans l\'UE, même sans réseau de votre opérateur.',
+                timeLimit: 45,
+                points: 90
+            },
+            {
+                type: 'true-false',
+                title: 'Partie 6 - Vrai ou Faux',
+                question: 'On peut raccrocher dès que l\'on a donné l\'adresse et le nombre de victimes.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 1,
+                explanation: 'FAUX - Il faut toujours attendre que le régulateur vous dise de raccrocher. Il peut avoir besoin d\'informations complémentaires ou vous donner des consignes.',
+                timeLimit: 50,
+                points: 95
+            },
+            {
+                type: 'true-false',
+                title: 'Partie 6 - Vrai ou Faux',
+                question: 'Si on est seul face à une victime en arrêt cardiaque, il faut d\'abord commencer la réanimation avant d\'alerter.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 1,
+                explanation: 'FAUX - L\'alerte est prioritaire en cas d\'arrêt cardiaque. Il faut d\'abord alerter (ou faire alerter) pour que les secours arrivent le plus vite possible, puis commencer la réanimation.',
+                timeLimit: 55,
+                points: 100
+            },
+            // Jeu 2 avec 5 variations
+            [
+                {
+                    type: 'quiz',
+                    title: 'Partie 6 - Moyens d\'alerte',
+                    question: 'Quel est le meilleur moyen pour alerter les secours ?',
+                    options: [
+                        'Envoyer un SMS',
+                        'Téléphoner',
+                        'Envoyer quelqu\'un prévenir',
+                        'Crier'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 50,
+                    points: 100
+                },
+                {
+                    type: 'sequence',
+                    title: 'Partie 6 - Faire alerter',
+                    question: 'Si vous faites alerter par un témoin, dans quel ordre procéder :',
+                    items: [
+                        'Désigner une personne précise',
+                        'Lui dire quel numéro appeler',
+                        'Lui dire quoi dire',
+                        'Lui demander de revenir vous informer'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'matching',
+                    title: 'Partie 6 - Situations et numéros',
+                    question: 'Associez chaque situation au numéro approprié :',
+                    pairs: [
+                        { left: 'Malaise cardiaque', right: '15 - SAMU' },
+                        { left: 'Incendie', right: '18 - Pompiers' },
+                        { left: 'Agression', right: '17 - Police' },
+                        { left: 'En Europe (voyage)', right: '112' }
+                    ],
+                    timeLimit: 85,
+                    points: 130
+                },
+                {
+                    type: 'quiz-multi',
+                    title: 'Partie 6 - Règles de l\'alerte',
+                    question: 'Quelles sont les règles à respecter lors de l\'alerte ? (Plusieurs réponses)',
+                    options: [
+                        'Rester calme',
+                        'Parler vite pour gagner du temps',
+                        'Répondre aux questions',
+                        'Raccrocher en premier',
+                        'Donner des informations précises',
+                        'Inventer si on ne sait pas'
+                    ],
+                    correctAnswers: [0, 2, 4],
+                    timeLimit: 75,
+                    points: 130
+                }
+            ]
+        ]
+    },
+    {
+        title: 'DC2 - Secourir',
+        subtitle: 'Hémorragie externe',
+        icon: '🩸',
+        color: 'from-red-600 to-pink-700',
+        games: [
+            // Jeu 1 avec 6 variations
+            [
+                {
+                    type: 'sequence',
+                    title: 'Partie 7.1 - Arrêter une hémorragie',
+                    question: 'Remettez dans l\'ordre les étapes pour arrêter une hémorragie externe :',
+                    items: [
+                        'Allonger la victime',
+                        'Comprimer directement sur la plaie',
+                        'Faire alerter les secours',
+                        'Surveiller la victime'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 70,
+                    points: 120
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 7.1 - Compression directe',
+                    question: 'Avec quoi effectuez-vous la compression directe en priorité ?',
+                    options: [
+                        'Avec un garrot',
+                        'Avec vos mains protégées',
+                        'Avec un pansement compressif',
+                        'En surélevant simplement le membre'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 55,
+                    points: 110
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 7.1 - Protection',
+                    question: 'Pourquoi faut-il se protéger avant de comprimer une plaie ?',
+                    options: [
+                        'Pour ne pas salir ses mains',
+                        'Pour se protéger du sang (risque infectieux)',
+                        'Ce n\'est pas obligatoire',
+                        'Pour ne pas faire mal à la victime'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 60,
+                    points: 100
+                },
+                {
+                    type: 'quiz-multi',
+                    title: 'Partie 7.1 - Matériel de compression',
+                    question: 'Avec quoi peut-on comprimer une plaie ? (Plusieurs réponses)',
+                    options: [
+                        'Main protégée par un gant',
+                        'Compresse propre',
+                        'Linge propre',
+                        'Main nue si rien d\'autre',
+                        'Un mouchoir sale',
+                        'Un tissu propre'
+                    ],
+                    correctAnswers: [0, 1, 2, 3, 5],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 7.1 - Durée de compression',
+                    question: 'Combien de temps faut-il maintenir la compression ?',
+                    options: [
+                        '1 minute',
+                        '5 minutes',
+                        'Jusqu\'à l\'arrivée des secours',
+                        '10 secondes'
+                    ],
+                    correctAnswer: 2,
+                    timeLimit: 55,
+                    points: 100
+                },
+                {
+                    type: 'quiz-illustrated',
+                    illustrationFunction: 'getCompressionSVG',
+                    title: 'Partie 7.1 - Geste de compression',
+                    question: 'Pourquoi faut-il protéger ses mains avant de comprimer une plaie qui saigne ?',
+                    options: [
+                        'Pour ne pas salir ses mains',
+                        'Pour se protéger du risque infectieux (sang)',
+                        'Ce n\'est pas nécessaire',
+                        'Pour ne pas faire mal à la victime'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 70,
+                    points: 110
+                }
+            ],
+            // Nouveaux jeux Vrai/Faux - Hémorragie
+            {
+                type: 'true-false',
+                title: 'Partie 7.1 - Vrai ou Faux',
+                question: 'Il faut toujours utiliser un garrot en cas d\'hémorragie importante.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 1,
+                explanation: 'FAUX - Le garrot n\'est utilisé qu\'en dernier recours si la compression directe est impossible ou inefficace (membre arraché, écrasement, plusieurs victimes). La compression directe est la technique de premier choix.',
+                timeLimit: 55,
+                points: 100
+            },
+            {
+                type: 'true-false',
+                title: 'Partie 7.1 - Vrai ou Faux',
+                question: 'On peut relâcher la compression pour vérifier si le saignement s\'est arrêté.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 1,
+                explanation: 'FAUX - Il ne faut JAMAIS relâcher la compression. Elle doit être maintenue jusqu\'à l\'arrivée des secours spécialisés qui prendront le relais.',
+                timeLimit: 50,
+                points: 95
+            },
+            {
+                type: 'true-false',
+                title: 'Partie 7.1 - Vrai ou Faux',
+                question: 'Une hémorragie externe est toujours visible à l\'œil nu.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 0,
+                explanation: 'VRAI - Une hémorragie externe est par définition un saignement abondant visible qui ne s\'arrête pas spontanément. Une hémorragie interne, elle, n\'est pas visible.',
+                timeLimit: 45,
+                points: 90
+            },
+            // Jeu 2 avec 5 variations
+            [
+                {
+                    type: 'matching',
+                    title: 'Partie 7.1 - Types d\'hémorragies',
+                    question: 'Associez chaque saignement à sa catégorie :',
+                    pairs: [
+                        { left: 'Saignement abondant qui ne s\'arrête pas', right: 'Hémorragie' },
+                        { left: 'Petit saignement qui s\'arrête seul', right: 'Plaie simple' },
+                        { left: 'Sang qui coule en nappe', right: 'Hémorragie veineuse' },
+                        { left: 'Sang qui jaillit par jets', right: 'Hémorragie artérielle' }
+                    ],
+                    timeLimit: 90,
+                    points: 130
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 7.1 - Position de la victime',
+                    question: 'Quelle position adopter pour une victime qui saigne abondamment ?',
+                    options: [
+                        'Debout',
+                        'Allongée',
+                        'Assise',
+                        'En position latérale de sécurité'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 55,
+                    points: 100
+                },
+                {
+                    type: 'sequence',
+                    title: 'Partie 7.1 - Relais de compression',
+                    question: 'Si vous devez relayer la compression, dans quel ordre :',
+                    items: [
+                        'Préparer le relais (gants, compresse)',
+                        'Positionner ses mains à côté des vôtres',
+                        'Le relais appuie, vous retirez vos mains',
+                        'Vérifier que la compression est efficace'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'quiz-multi',
+                    title: 'Partie 7.1 - Surveillance',
+                    question: 'Que devez-vous surveiller chez une victime qui saigne ? (Plusieurs réponses)',
+                    options: [
+                        'La conscience',
+                        'La respiration',
+                        'L\'efficacité de la compression',
+                        'Sa température',
+                        'L\'apparition de pâleur/sueurs',
+                        'Son humeur'
+                    ],
+                    correctAnswers: [0, 1, 2, 4],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'puzzle-text',
+                    title: 'Partie 7.1 - Conduite à tenir complète',
+                    question: 'Reconstituez la conduite à tenir face à une hémorragie :',
+                    pieces: [
+                        '1. Allonger la victime',
+                        '2. Comprimer la plaie',
+                        '3. Faire alerter le 15',
+                        '4. Surveiller en attendant les secours'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 75,
+                    points: 130
+                }
+            ]
+        ]
+    },
+    {
+        title: 'DC2 - Secourir',
+        subtitle: 'Obstruction des voies aériennes',
+        icon: '😮',
+        color: 'from-purple-500 to-purple-700',
+        games: [
+            // Jeu 1 avec 6 variations
+            [
+                {
+                    type: 'matching',
+                    title: 'Partie 7.2 - Obstruction partielle vs totale',
+                    question: 'Associez les signes avec le type d\'obstruction :',
+                    pairs: [
+                        { left: 'La victime peut parler', right: 'Obstruction partielle' },
+                        { left: 'La victime ne peut plus parler ni tousser', right: 'Obstruction totale' },
+                        { left: 'La victime tousse vigoureusement', right: 'Obstruction partielle' },
+                        { left: 'Impossibilité de respirer', right: 'Obstruction totale' }
+                    ],
+                    timeLimit: 85,
+                    points: 130
+                },
+                {
+                    type: 'sequence',
+                    title: 'Partie 7.2 - Obstruction totale',
+                    question: 'Ordre des gestes en cas d\'obstruction totale (adulte) :',
+                    items: [
+                        'Donner 5 claques dans le dos',
+                        'Si inefficace : 5 compressions abdominales',
+                        'Alterner claques/compressions',
+                        'Si inconscient : RCP'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 7.2 - Obstruction partielle',
+                    question: 'Que faire en cas d\'obstruction partielle ?',
+                    options: [
+                        'Donner des claques dans le dos',
+                        'Faire des compressions abdominales',
+                        'Encourager la victime à tousser',
+                        'Mettre les doigts dans la bouche'
+                    ],
+                    correctAnswer: 2,
+                    timeLimit: 60,
+                    points: 110
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 7.2 - Claques dans le dos',
+                    question: 'Où donner les claques dans le dos ?',
+                    options: [
+                        'En bas du dos',
+                        'Entre les deux omoplates',
+                        'Sur la nuque',
+                        'Sur le côté'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 55,
+                    points: 100
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 7.2 - Compressions abdominales',
+                    question: 'Où placer le poing pour les compressions abdominales (méthode de Heimlich) ?',
+                    options: [
+                        'Sur le sternum',
+                        'Sur le nombril',
+                        'Entre le nombril et l\'extrémité inférieure du sternum',
+                        'Sur les côtes'
+                    ],
+                    correctAnswer: 2,
+                    timeLimit: 65,
+                    points: 110
+                },
+                {
+                    type: 'quiz-illustrated',
+                    illustrationFunction: 'getHeimlichSVG',
+                    title: 'Partie 7.2 - Position des mains',
+                    question: 'Où doit-on placer le poing pour effectuer les compressions abdominales (méthode de Heimlich) ?',
+                    options: [
+                        'Sur le sternum',
+                        'Entre le nombril et le sternum',
+                        'Sur le nombril',
+                        'En bas du dos'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 70,
+                    points: 110
+                }
+            ],
+            // Nouveaux jeux Vrai/Faux - Obstruction
+            {
+                type: 'true-false',
+                title: 'Partie 7.2 - Vrai ou Faux',
+                question: 'On doit encourager la victime à tousser si elle présente une obstruction partielle.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 0,
+                explanation: 'VRAI - Si la victime peut encore tousser, parler ou respirer (obstruction partielle), il faut l\'encourager à tousser vigoureusement car c\'est le moyen le plus efficace pour expulser le corps étranger.',
+                timeLimit: 50,
+                points: 95
+            },
+            {
+                type: 'true-false',
+                title: 'Partie 7.2 - Vrai ou Faux',
+                question: 'Les compressions abdominales (Heimlich) peuvent être utilisées sur une femme enceinte.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 1,
+                explanation: 'FAUX - Sur une femme enceinte ou une personne obèse, on réalise des compressions thoraciques à la place des compressions abdominales pour éviter de comprimer l\'abdomen.',
+                timeLimit: 55,
+                points: 100
+            },
+            {
+                type: 'true-false',
+                title: 'Partie 7.2 - Vrai ou Faux',
+                question: 'Si la victime devient inconsciente suite à une obstruction totale, on doit commencer la RCP.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 0,
+                explanation: 'VRAI - Si la victime perd conscience, on l\'installe au sol et on commence immédiatement la réanimation cardio-pulmonaire (RCP) avec 30 compressions thoraciques.',
+                timeLimit: 55,
+                points: 100
+            },
+            // Jeu 2 avec 5 variations
+            [
+                {
+                    type: 'quiz-multi',
+                    title: 'Partie 7.2 - Signes d\'obstruction totale',
+                    question: 'Quels sont les signes d\'une obstruction totale ? (Plusieurs réponses)',
+                    options: [
+                        'Impossibilité de parler',
+                        'Toux vigoureuse',
+                        'Impossibilité de tousser',
+                        'Geste de la main à la gorge',
+                        'Parle normalement',
+                        'Cyanose (bleuissement)'
+                    ],
+                    correctAnswers: [0, 2, 3, 5],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 7.2 - Nourrisson',
+                    question: 'Pour un nourrisson en obstruction totale, que faire au lieu des compressions abdominales ?',
+                    options: [
+                        'Compressions thoraciques',
+                        'Rien, attendre les secours',
+                        'Secouer le bébé',
+                        'Mettre le doigt dans la bouche'
+                    ],
+                    correctAnswer: 0,
+                    timeLimit: 60,
+                    points: 110
+                },
+                {
+                    type: 'sequence',
+                    title: 'Partie 7.2 - Si victime inconsciente',
+                    question: 'Si la victime devient inconsciente pendant la désobstruction :',
+                    items: [
+                        'Allonger la victime sur le dos',
+                        'Faire alerter le 15',
+                        'Débuter immédiatement la RCP',
+                        'Vérifier la bouche entre les cycles'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'matching',
+                    title: 'Partie 7.2 - Techniques selon l\'âge',
+                    question: 'Associez la technique à la catégorie de victime :',
+                    pairs: [
+                        { left: 'Claques dans le dos + Heimlich', right: 'Adulte' },
+                        { left: 'Claques dans le dos + compressions thoraciques', right: 'Nourrisson' },
+                        { left: 'Même technique que l\'adulte', right: 'Enfant' },
+                        { left: 'Adaptée à la taille', right: 'Femme enceinte' }
+                    ],
+                    timeLimit: 90,
+                    points: 130
+                },
+                {
+                    type: 'puzzle-text',
+                    title: 'Partie 7.2 - Procédure complète',
+                    question: 'Ordre de la procédure en cas d\'obstruction totale :',
+                    pieces: [
+                        '1. Encourager à tousser (si partielle)',
+                        '2. 5 claques dans le dos',
+                        '3. 5 compressions abdominales',
+                        '4. Alterner jusqu\'à désobstruction ou perte de conscience'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 80,
+                    points: 130
+                }
+            ]
+        ]
+    },
+    {
+        title: 'DC2 - Secourir',
+        subtitle: 'PLS et Arrêt cardiaque',
+        icon: '💓',
+        color: 'from-pink-500 to-red-600',
+        games: [
+            // Jeu 1 avec 7 variations
+            [
+                {
+                    type: 'quiz',
+                    title: 'Partie 7.3 - Position Latérale de Sécurité',
+                    question: 'Quand met-on une victime en Position Latérale de Sécurité (PLS) ?',
+                    options: [
+                        'Victime consciente avec douleur',
+                        'Victime inconsciente qui respire',
+                        'Victime en arrêt cardiaque',
+                        'Victime avec hémorragie'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 50,
+                    points: 100
+                },
+                {
+                    type: 'quiz-multi',
+                    title: 'Partie 7.4 - Arrêt cardiaque',
+                    question: 'Quels sont les signes d\'un arrêt cardiaque ? (Plusieurs réponses)',
+                    options: [
+                        'Victime inconsciente',
+                        'Victime ne respire pas',
+                        'Victime respire normalement',
+                        'Absence de réaction',
+                        'Victime parle'
+                    ],
+                    correctAnswers: [0, 1, 3],
+                    timeLimit: 70,
+                    points: 130
+                },
+                {
+                    type: 'sequence',
+                    title: 'Partie 7.4 - Réanimation cardio-pulmonaire',
+                    question: 'Ordre des étapes de la RCP :',
+                    items: [
+                        'Placer les mains au centre du thorax',
+                        '30 compressions thoraciques',
+                        '2 insufflations',
+                        'Poursuivre les cycles 30/2'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 70,
+                    points: 120
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 7.4 - Fréquence des compressions',
+                    question: 'À quelle fréquence doivent être réalisées les compressions thoraciques ?',
+                    options: [
+                        '60 par minute',
+                        '100 à 120 par minute',
+                        '150 par minute',
+                        '30 par minute'
                     ],
                     correctAnswer: 1,
                     timeLimit: 60,
@@ -1935,153 +2909,416 @@ const defaultBoxesData = [
                 },
                 {
                     type: 'quiz',
-                    title: 'Consignes de sécurité',
-                    question: 'Où doivent être affichées les consignes de sécurité incendie ?',
+                    title: 'Partie 7.4 - Profondeur des compressions',
+                    question: 'Quelle doit être la profondeur des compressions thoraciques chez l\'adulte ?',
                     options: [
-                        'Uniquement à l\'entrée',
-                        'Dans chaque local',
-                        'Au bureau du dirigeant',
-                        'Sur le site internet de l\'entreprise'
+                        '2 cm',
+                        '5 à 6 cm',
+                        '10 cm',
+                        '1 cm'
                     ],
                     correctAnswer: 1,
                     timeLimit: 55,
                     points: 100
                 },
                 {
-                    type: 'quiz-multi',
-                    title: 'Obligations réglementaires',
-                    question: 'Que doit contenir le plan d\'évacuation ? (Plusieurs réponses)',
+                    type: 'quiz',
+                    title: 'Partie 7.3 - Pourquoi la PLS ?',
+                    question: 'Pourquoi met-on une victime inconsciente qui respire en PLS ?',
                     options: [
-                        'Les sorties de secours',
-                        'Les moyens d\'extinction',
-                        'Le point de rassemblement',
-                        'Les numéros d\'urgence',
-                        'La photo du dirigeant',
-                        'Le cheminement d\'évacuation'
+                        'Pour qu\'elle soit plus confortable',
+                        'Pour libérer les voies aériennes et éviter l\'obstruction',
+                        'Pour prendre le pouls',
+                        'Ce n\'est pas nécessaire'
                     ],
-                    correctAnswers: [0, 1, 2, 3, 5],
-                    timeLimit: 85,
-                    points: 150
+                    correctAnswer: 1,
+                    timeLimit: 65,
+                    points: 110
+                },
+                {
+                    type: 'quiz-illustrated',
+                    illustrationFunction: 'getRCPHandsSVG',
+                    title: 'Partie 7.4 - Position des mains RCP',
+                    question: 'Quelle est la profondeur des compressions thoraciques lors de la RCP chez l\'adulte ?',
+                    options: [
+                        '2-3 cm',
+                        '5-6 cm',
+                        '10 cm',
+                        '1 cm'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 70,
+                    points: 110
                 }
             ],
+            // Nouveaux jeux Vrai/Faux - PLS et RCP
             {
                 type: 'true-false',
-                title: 'Formation du personnel',
-                question: 'Selon le Code du Travail, l\'employeur doit former tous les travailleurs à la sécurité incendie.',
+                title: 'Partie 7.3/7.4 - Vrai ou Faux',
+                question: 'La fréquence des compressions thoraciques doit être de 100 à 120 compressions par minute.',
                 options: ['Vrai', 'Faux'],
                 correctAnswer: 0,
-                explanation: 'VRAI - L\'article R4227-39 impose à l\'employeur de faire bénéficier tous les travailleurs d\'une formation pratique et appropriée en matière de sécurité incendie.',
-                timeLimit: 60,
-                points: 110
+                explanation: 'VRAI - Le rythme optimal des compressions thoraciques est de 100 à 120 par minute, soit environ 2 compressions par seconde (rythme de "Staying Alive").',
+                timeLimit: 50,
+                points: 95
             },
             {
-                type: 'matching',
-                title: 'Articles du Code du Travail',
-                question: 'Associez chaque article à son contenu :',
-                pairs: [
-                    { left: 'R4227-28', right: 'Exercices d\'évacuation' },
-                    { left: 'R4227-38', right: 'Consignes de sécurité' },
-                    { left: 'R4227-39', right: 'Formation du personnel' },
-                    { left: 'R4227-29', right: 'Moyens d\'extinction' }
-                ],
-                timeLimit: 95,
-                points: 140
+                type: 'true-false',
+                title: 'Partie 7.4 - Vrai ou Faux',
+                question: 'On doit arrêter la RCP dès qu\'on a posé le défibrillateur (DAE).',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 1,
+                explanation: 'FAUX - On continue la RCP pendant que le DAE s\'installe et analyse. On ne s\'arrête que lorsque le DAE demande de ne pas toucher la victime.',
+                timeLimit: 55,
+                points: 100
             },
             {
-                type: 'sequence',
-                title: 'Responsabilités',
-                question: 'Remettez dans l\'ordre chronologique les obligations de l\'employeur :',
-                items: [
-                    'Évaluer les risques incendie',
-                    'Mettre en place des moyens de prévention',
-                    'Former le personnel',
-                    'Organiser des exercices d\'évacuation'
-                ],
-                correctOrder: [0, 1, 2, 3],
-                timeLimit: 75,
-                points: 130
-            }
+                type: 'true-false',
+                title: 'Partie 7.3 - Vrai ou Faux',
+                question: 'Une victime en PLS doit être surveillée en permanence jusqu\'à l\'arrivée des secours.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 0,
+                explanation: 'VRAI - La victime en PLS doit être surveillée en permanence car son état peut évoluer (arrêt de la respiration, vomissements, etc.).',
+                timeLimit: 50,
+                points: 95
+            },
+            // Jeu 2 avec 6 variations
+            [
+                {
+                    type: 'matching',
+                    title: 'Partie 7.4 - Gestes et situations',
+                    question: 'Associez chaque geste à la situation appropriée :',
+                    pairs: [
+                        { left: 'PLS', right: 'Inconscient qui respire' },
+                        { left: 'RCP', right: 'Arrêt cardiaque' },
+                        { left: 'Libération Voies Aériennes', right: 'Vérifier la respiration' },
+                        { left: 'DAE', right: 'Arrêt cardiaque' }
+                    ],
+                    timeLimit: 85,
+                    points: 130
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 7.4 - Défibrillateur (DAE)',
+                    question: 'Quand utiliser le défibrillateur automatisé externe (DAE) ?',
+                    options: [
+                        'Sur toute victime inconsciente',
+                        'Uniquement sur une victime en arrêt cardiaque',
+                        'Sur une victime qui respire mal',
+                        'Jamais, c\'est réservé aux médecins'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 65,
+                    points: 110
+                },
+                {
+                    type: 'sequence',
+                    title: 'Partie 7.4 - Utilisation du DAE',
+                    question: 'Ordre d\'utilisation du défibrillateur :',
+                    items: [
+                        'Mettre en marche le DAE',
+                        'Coller les électrodes sur la peau nue',
+                        'Laisser le DAE analyser',
+                        'Si choc conseillé : s\'écarter et appuyer sur le bouton'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'quiz-illustrated',
+                    illustrationFunction: 'getPLSSVG',
+                    title: 'Partie 7.3 - Position Latérale de Sécurité',
+                    question: 'Quelle est l\'angle de la jambe du dessus dans la Position Latérale de Sécurité (PLS) ?',
+                    options: [
+                        'Jambe tendue',
+                        'Jambe pliée à 45°',
+                        'Jambe pliée à 90°',
+                        'Jambe croisée'
+                    ],
+                    correctAnswer: 2,
+                    timeLimit: 70,
+                    points: 110
+                },
+                {
+                    type: 'quiz-multi',
+                    title: 'Partie 7.3 - Surveillance en PLS',
+                    question: 'Que devez-vous surveiller chez une victime en PLS ? (Plusieurs réponses)',
+                    options: [
+                        'La respiration',
+                        'La conscience',
+                        'Qu\'elle ne vomisse pas',
+                        'Ses cheveux',
+                        'La couleur de sa peau',
+                        'Ses chaussures'
+                    ],
+                    correctAnswers: [0, 1, 2, 4],
+                    timeLimit: 70,
+                    points: 130
+                },
+                {
+                    type: 'puzzle-text',
+                    title: 'Partie 7.3 - Étapes de la PLS',
+                    question: 'Reconstituez les étapes de mise en PLS :',
+                    pieces: [
+                        '1. Allonger la victime sur le dos',
+                        '2. Préparer le retournement (bras, jambe)',
+                        '3. Retourner la victime sur le côté',
+                        '4. Stabiliser et basculer la tête en arrière'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 7.4 - Arrêt de la RCP',
+                    question: 'Quand peut-on arrêter la réanimation cardio-pulmonaire ?',
+                    options: [
+                        'Après 5 minutes',
+                        'Quand on est fatigué',
+                        'Quand les secours prennent le relais ou si la victime réagit',
+                        'Jamais'
+                    ],
+                    correctAnswer: 2,
+                    timeLimit: 65,
+                    points: 110
+                }
+            ]
+        ]
+    },
+    {
+        title: 'DC2 - Secourir',
+        subtitle: 'Situations spécifiques',
+        icon: '🏥',
+        color: 'from-indigo-500 to-blue-700',
+        games: [
+            // Jeu 1 avec 7 variations
+            [
+                {
+                    type: 'matching',
+                    title: 'Partie 8 - Malaises et traumatismes',
+                    question: 'Associez chaque situation avec la conduite à tenir :',
+                    pairs: [
+                        { left: 'Malaise cardiaque', right: 'Position confortable + alerter' },
+                        { left: 'Brûlure', right: 'Refroidir 5 min minimum' },
+                        { left: 'Traumatisme cervical', right: 'Ne pas mobiliser' },
+                        { left: 'Plaie grave', right: 'Protéger sans retirer corps étranger' }
+                    ],
+                    timeLimit: 90,
+                    points: 140
+                },
+                {
+                    type: 'quiz-illustrated',
+                    illustrationFunction: 'getRCPHandsSVG',
+                    title: 'Partie 8 - Position RCP',
+                    question: 'Où doit-on placer les mains lors d\'une réanimation cardio-pulmonaire (RCP) ?',
+                    options: [
+                        'Au centre du thorax (sternum)',
+                        'Sur les côtes',
+                        'Sur le ventre',
+                        'Sur le cou'
+                    ],
+                    correctAnswer: 0,
+                    timeLimit: 70,
+                    points: 110
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 8 - Brûlures',
+                    question: 'Combien de temps faut-il refroidir une brûlure à l\'eau tempérée ?',
+                    options: [
+                        '30 secondes',
+                        '5 minutes minimum',
+                        '1 minute',
+                        'Jusqu\'à ce que ça ne fasse plus mal'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 60,
+                    points: 100
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 8 - Malaise',
+                    question: 'Quelle position donner à une victime consciente qui fait un malaise ?',
+                    options: [
+                        'Debout',
+                        'Position confortable choisie par la victime',
+                        'Allongée sur le ventre',
+                        'Position assise forcée'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 60,
+                    points: 100
+                },
+                {
+                    type: 'quiz-multi',
+                    title: 'Partie 8 - Signes de malaise grave',
+                    question: 'Quels sont les signes d\'un malaise grave ? (Plusieurs réponses)',
+                    options: [
+                        'Douleur thoracique',
+                        'Difficulté à parler',
+                        'Léger mal de tête',
+                        'Perte de connaissance',
+                        'Sueurs abondantes',
+                        'Petite fatigue'
+                    ],
+                    correctAnswers: [0, 1, 3, 4],
+                    timeLimit: 75,
+                    points: 130
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 8 - Plaie avec corps étranger',
+                    question: 'Que faire face à une plaie avec un corps étranger (couteau, morceau de verre...) ?',
+                    options: [
+                        'Retirer le corps étranger',
+                        'Ne jamais retirer le corps étranger',
+                        'Le bouger pour voir',
+                        'Appuyer dessus'
+                    ],
+                    correctAnswer: 1,
+                    timeLimit: 60,
+                    points: 110
+                },
+                {
+                    type: 'sequence',
+                    title: 'Partie 8 - Traumatisme de membre',
+                    question: 'Conduite à tenir face à un traumatisme de membre :',
+                    items: [
+                        'Éviter de mobiliser le membre',
+                        'Alerter les secours',
+                        'Surveiller la victime',
+                        'Maintenir le membre dans la position trouvée'
+                    ],
+                    correctOrder: [0, 3, 1, 2],
+                    timeLimit: 75,
+                    points: 130
+                }
+            ],
+            // Nouveaux jeux Vrai/Faux - Situations spécifiques
+            {
+                type: 'true-false',
+                title: 'Partie 8 - Vrai ou Faux',
+                question: 'Une brûlure doit être refroidie à l\'eau froide pendant au moins 5 minutes.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 0,
+                explanation: 'VRAI - Le refroidissement à l\'eau tempérée (15-25°C) doit durer au moins 5 minutes pour limiter l\'extension de la brûlure et soulager la douleur.',
+                timeLimit: 50,
+                points: 95
+            },
+            {
+                type: 'true-false',
+                title: 'Partie 8 - Vrai ou Faux',
+                question: 'On doit retirer un corps étranger planté dans une plaie pour mieux la soigner.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 1,
+                explanation: 'FAUX - Il ne faut JAMAIS retirer un corps étranger d\'une plaie. Cela pourrait provoquer une hémorragie importante ou aggraver les lésions. Seul un médecin peut le faire.',
+                timeLimit: 50,
+                points: 95
+            },
+            {
+                type: 'true-false',
+                title: 'Partie 8 - Vrai ou Faux',
+                question: 'En cas de traumatisme du dos ou de la nuque, il faut éviter tout déplacement de la victime.',
+                options: ['Vrai', 'Faux'],
+                correctAnswer: 0,
+                explanation: 'VRAI - Un traumatisme de la colonne vertébrale peut être aggravé par tout mouvement. Il faut maintenir la victime dans la position trouvée et attendre les secours spécialisés.',
+                timeLimit: 55,
+                points: 100
+            },
+            // Jeu 2 avec 6 variations
+            [
+                {
+                    type: 'matching',
+                    title: 'Partie 8 - Types de plaies',
+                    question: 'Associez chaque type de plaie à sa définition :',
+                    pairs: [
+                        { left: 'Plaie simple', right: 'Petite, propre, ne saigne pas' },
+                        { left: 'Plaie grave', right: 'Large, profonde, avec corps étranger' },
+                        { left: 'Brûlure 1er degré', right: 'Rougeur sans cloque' },
+                        { left: 'Brûlure 2e degré', right: 'Avec cloques' }
+                    ],
+                    timeLimit: 90,
+                    points: 130
+                },
+                {
+                    type: 'quiz',
+                    title: 'Partie 8 - Fracture',
+                    question: 'Comment savoir si un membre est fracturé ?',
+                    options: [
+                        'La victime ressent une douleur vive et ne peut pas bouger le membre',
+                        'Le membre est chaud',
+                        'La peau change de couleur',
+                        'On ne peut jamais savoir'
+                    ],
+                    correctAnswer: 0,
+                    timeLimit: 65,
+                    points: 110
+                },
+                {
+                    type: 'quiz-multi',
+                    title: 'Partie 8 - Brûlure grave',
+                    question: 'Quels critères font qu\'une brûlure est grave ? (Plusieurs réponses)',
+                    options: [
+                        'Étendue importante',
+                        'Localisation (visage, mains, organes génitaux)',
+                        'Profondeur (3e degré)',
+                        'Petite rougeur',
+                        'Victime est un enfant ou personne âgée',
+                        'Brûlure chimique ou électrique'
+                    ],
+                    correctAnswers: [0, 1, 2, 4, 5],
+                    timeLimit: 80,
+                    points: 140
+                },
+                {
+                    type: 'sequence',
+                    title: 'Partie 8 - Plaie simple',
+                    question: 'Conduite à tenir face à une plaie simple :',
+                    items: [
+                        'Se laver les mains',
+                        'Nettoyer la plaie à l\'eau et au savon',
+                        'Rincer abondamment',
+                        'Protéger par un pansement'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 70,
+                    points: 120
+                },
+                {
+                    type: 'quiz-illustrated',
+                    illustrationFunction: 'getCompressionSVG',
+                    title: 'Partie 8 - Compression hémorragie',
+                    question: 'Combien de temps faut-il maintenir la compression sur une plaie qui saigne ?',
+                    options: [
+                        '1 minute',
+                        '5 minutes',
+                        'Jusqu\'à l\'arrivée des secours',
+                        '10 secondes'
+                    ],
+                    correctAnswer: 2,
+                    timeLimit: 70,
+                    points: 110
+                },
+                {
+                    type: 'puzzle-text',
+                    title: 'Partie 8 - Conduite générale',
+                    question: 'Ordre général de prise en charge d\'une victime :',
+                    pieces: [
+                        '1. Protéger',
+                        '2. Examiner',
+                        '3. Alerter',
+                        '4. Secourir et surveiller'
+                    ],
+                    correctOrder: [0, 1, 2, 3],
+                    timeLimit: 70,
+                    points: 120
+                }
+            ]
         ]
     }
 ];
-
-// ==================== PERSISTENCE DES MODIFICATIONS ADMIN ====================
-
-// Sauvegarder les modifications dans Firebase
-function saveBoxesDataToFirebase() {
-    if (!database) {
-        console.error('❌ Firebase non initialisé');
-        return Promise.reject('Firebase non initialisé');
-    }
-
-    try {
-        const dataToSave = JSON.stringify(boxesData);
-        return database.ref('admin_config/evacuation_incendie_data').set(dataToSave)
-            .then(() => {
-                console.log('✅ Modifications sauvegardées dans Firebase');
-                return true;
-            })
-            .catch(error => {
-                console.error('❌ Erreur lors de la sauvegarde Firebase:', error);
-                return false;
-            });
-    } catch (error) {
-        console.error('❌ Erreur lors de la sauvegarde:', error);
-        return Promise.reject(error);
-    }
-}
-
-// Charger les données modifiées depuis Firebase
-function loadBoxesDataFromFirebase() {
-    if (!database) {
-        console.log('⚠️ Firebase non initialisé, utilisation des données par défaut');
-        return Promise.resolve(null);
-    }
-
-    return database.ref('admin_config/evacuation_incendie_data').once('value')
-        .then(snapshot => {
-            const savedData = snapshot.val();
-            if (savedData) {
-                try {
-                    const parsed = JSON.parse(savedData);
-                    console.log('📥 Données modifiées chargées depuis Firebase');
-                    return parsed;
-                } catch (error) {
-                    console.error('❌ Erreur parsing données Firebase:', error);
-                    return null;
-                }
-            }
-            return null;
-        })
-        .catch(error => {
-            console.error('❌ Erreur lors du chargement Firebase:', error);
-            return null;
-        });
-}
-
-// Réinitialiser aux données par défaut
-function resetToDefaultData() {
-    if (!database) {
-        console.error('❌ Firebase non initialisé');
-        return Promise.reject('Firebase non initialisé');
-    }
-
-    return database.ref('admin_config/evacuation_incendie_data').remove()
-        .then(() => {
-            console.log('🔄 Données réinitialisées aux valeurs par défaut');
-            // Recharger les données par défaut
-            boxesData.length = 0;
-            boxesData.push(...JSON.parse(JSON.stringify(defaultBoxesData)));
-            return true;
-        })
-        .catch(error => {
-            console.error('❌ Erreur lors de la réinitialisation:', error);
-            return false;
-        });
-}
-
-// Initialiser boxesData (sera chargé depuis Firebase après l'init)
-let boxesData = JSON.parse(JSON.stringify(defaultBoxesData)); // Deep copy par défaut
 
 // ==================== ÉTAT DU JEU ====================
 
@@ -2126,8 +3363,7 @@ function broadcastUpdate() {
 
     const update = {
         type: 'team_update',
-        trainingSessionId: trainingSessionId, // Session de formation commune
-        teamId: teamId, // ID unique de l'équipe
+        sessionId: sessionId,
         teamName: currentTeamName,
         boxesUnlocked: gameState.boxesUnlocked,
         totalScore: gameState.totalScore,
@@ -2147,13 +3383,9 @@ function broadcastUpdate() {
 
     // DEBUG: Afficher ce qu'on envoie à Firebase
     console.log('📤 Envoi à Firebase:', update);
-    console.log('🔑 Clé Firebase utilisée:', 'teams/' + teamId);
-    console.log('🆔 trainingSessionId actuel:', trainingSessionId);
-    console.log('👥 teamId actuel:', teamId);
 
     // Enregistrer dans Firebase Realtime Database
-    // Chaque équipe a un teamId unique, donc pas de conflit
-    database.ref('teams/' + teamId).set(update).catch(error => {
+    database.ref('teams/' + sessionId).set(update).catch(error => {
         console.error('❌ Erreur Firebase:', error);
     });
 }
@@ -2243,7 +3475,7 @@ function startListeningToStages() {
 
         // Vérifier si le jeu est en pause sur l'une des étapes
         let foundPause = false;
-        for (let i = 1; i <= 2; i++) {
+        for (let i = 1; i <= 4; i++) {
             const stage = stages[`stage${i}`];
             if (stage && stage.paused) {
                 foundPause = true;
@@ -2304,48 +3536,24 @@ function generateQRCode() {
     const qrContainer = document.getElementById('qrcode');
     qrContainer.innerHTML = ''; // Clear existing
 
-    // CORRECTION: Utiliser origin + pathname au lieu de href pour éviter les paramètres parasites
-    let baseUrl = window.location.origin + window.location.pathname;
+    // Créer l'URL avec le paramètre mode=player pour l'accès joueur
+    let baseUrl = window.location.href;
 
-    console.log('🔗 Génération QR Code - Base URL:', baseUrl);
-
-    // Créer l'URL avec les paramètres
-    let finalUrl;
-
-    // Si on est en local (file://), afficher un avertissement mais générer quand même
+    // Si on est en local (file://), utiliser l'URL de votre GitHub Pages
     if (baseUrl.startsWith('file://')) {
-        const warningDiv = document.createElement('div');
-        warningDiv.className = 'mb-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-center';
-        warningDiv.innerHTML = `
-            <p class="text-xs text-yellow-800 dark:text-yellow-200 mb-1">⚠️ Mode local - QR code non fonctionnel</p>
-            <p class="text-xs text-yellow-700 dark:text-yellow-300">Hébergez le fichier en ligne (GitHub Pages, etc.)</p>
-        `;
-        qrContainer.appendChild(warningDiv);
-        // Utiliser l'URL file:// quand même pour affichage
-        finalUrl = baseUrl + '?mode=player&session=' + trainingSessionId;
-    } else {
-        const url = new URL(baseUrl);
-        url.searchParams.set('mode', 'player');
-        url.searchParams.set('session', trainingSessionId);
-        finalUrl = url.toString();
+        baseUrl = 'https://mboyer3215-debug.github.io/challenge_cup_sst/';
     }
 
-    console.log('🔗 URL complète du QR code:', finalUrl);
+    const url = new URL(baseUrl);
+    url.searchParams.set('mode', 'player');
 
-    // Générer le QR code (même en local pour visualisation)
     new QRCode(qrContainer, {
-        text: finalUrl,
+        text: url.toString(),
         width: 200,
         height: 200,
-        colorDark: '#DC2626', // Rouge pour le thème incendie
+        colorDark: '#5D5CDE',
         colorLight: '#ffffff',
     });
-
-    // Afficher l'URL sous le QR code pour faciliter le test
-    const urlDisplay = document.createElement('div');
-    urlDisplay.className = 'mt-3 text-xs text-gray-600 dark:text-gray-400 break-all p-2 bg-gray-100 dark:bg-gray-800 rounded';
-    urlDisplay.innerHTML = `<strong>URL:</strong><br>${finalUrl}`;
-    qrContainer.appendChild(urlDisplay);
 }
 
 // Initialisation au chargement
@@ -2364,10 +3572,6 @@ window.addEventListener('DOMContentLoaded', () => {
         appMode = 'supervisor';
 
         showScreen('supervisor-screen');
-
-        // Afficher le trainingSessionId dans l'interface
-        document.getElementById('training-session-display').textContent = trainingSessionId;
-
         loadTeamsFromFirebase();
 
         // Écouter les changements en temps réel
@@ -2391,12 +3595,6 @@ window.addEventListener('DOMContentLoaded', () => {
         playSound('tick');
         currentTeamName = teamName;
         appMode = 'player';
-
-        // Générer un teamId unique basé sur le trainingSessionId et le nom de l'équipe
-        // Cela permet à une équipe de reprendre son jeu si elle recharge la page
-        const teamNameHash = teamName.toLowerCase().replace(/\s+/g, '_');
-        teamId = trainingSessionId + '_' + teamNameHash;
-        console.log('👥 Team ID créé:', teamId);
 
         // DEBUG: Vérifier gameState AVANT reset
         console.log('🔍 AVANT resetGameState():', {
@@ -2514,15 +3712,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
                 // Réinitialiser l'objet teams
                 teams = {};
-
-                // Réinitialiser les modifications admin (retour aux données par défaut)
-                resetToDefaultData()
-                    .then(() => {
-                        console.log('✅ Données du jeu réinitialisées aux valeurs par défaut');
-                    })
-                    .catch(err => {
-                        console.error('❌ Erreur réinitialisation données jeu:', err);
-                    });
 
                 // Envoyer une commande à tous les joueurs pour réinitialiser
                 sendCommand('reset_all');
@@ -2689,31 +3878,24 @@ window.addEventListener('DOMContentLoaded', () => {
                     const gameLabel = gameTypeLabels[game.type] || game.type || '❓';
                     const gameTitle = game.title || game.question || 'Sans titre';
 
-                    // Ajouter le numéro de variante au titre si plusieurs variantes existent
-                    const titleWithVariation = gamesArray.length > 1
-                        ? `[${variationIndex + 1}/${gamesArray.length}] ${gameTitle}`
-                        : gameTitle;
-
                     // Tronquer le titre si trop long
-                    const displayTitle = titleWithVariation.length > 50 ? titleWithVariation.substring(0, 47) + '...' : titleWithVariation;
+                    const displayTitle = gameTitle.length > 45 ? gameTitle.substring(0, 42) + '...' : gameTitle;
 
                     // Badge pour indiquer la variation (1/4, 2/4, etc.)
                     const variationBadge = gamesArray.length > 1 ?
-                        `<span class="ml-1 px-1.5 py-0.5 bg-purple-500 text-white text-[10px] rounded-full font-bold">${variationIndex + 1}/${gamesArray.length}</span>` : '';
+                        `<span class="ml-1 px-1.5 py-0.5 bg-purple-500 text-white text-[10px] rounded-full">${variationIndex + 1}/${gamesArray.length}</span>` : '';
 
                     boxHTML += `
                         <button
-                            class="admin-game-btn w-full text-left px-3 py-2 bg-gray-50 dark:bg-gray-700 hover:bg-primary hover:text-white dark:hover:bg-primary rounded-lg transition-all text-xs group mb-1"
+                            class="admin-game-btn w-full text-left px-3 py-2 bg-gray-50 dark:bg-gray-700 hover:bg-primary hover:text-white dark:hover:bg-primary rounded-lg transition-all text-xs group"
                             data-box="${boxIndex}"
                             data-game="${gameIndex}"
                             data-variation="${variationIndex}"
-                            title="${titleWithVariation}"
+                            title="${gameTitle} ${gamesArray.length > 1 ? '(Variation ' + (variationIndex + 1) + '/' + gamesArray.length + ')' : ''}"
                         >
-                            <div class="flex items-center justify-between gap-2">
-                                <div class="flex items-start gap-2 flex-1 min-w-0">
-                                    <span class="text-sm flex-shrink-0">${gameLabel}</span>
-                                    <span class="flex-1 line-clamp-2 truncate">${displayTitle}</span>
-                                </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-sm flex-shrink-0">${gameLabel}</span>
+                                <span class="flex-1 line-clamp-2">${displayTitle}</span>
                                 ${variationBadge}
                             </div>
                         </button>
@@ -2755,17 +3937,9 @@ window.addEventListener('DOMContentLoaded', () => {
         // Ajouter les événements sur les boutons de jeu
         document.querySelectorAll('.admin-game-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                const boxIndex = parseInt(btn.getAttribute('data-box'));
-                const gameIndex = parseInt(btn.getAttribute('data-game'));
-                const variationIndex = parseInt(btn.getAttribute('data-variation') || '0');
-                console.log('🔍 Clic sur bouton:', {
-                    boxIndex,
-                    gameIndex,
-                    variationIndex,
-                    rawDataBox: btn.getAttribute('data-box'),
-                    rawDataGame: btn.getAttribute('data-game'),
-                    rawDataVariation: btn.getAttribute('data-variation')
-                });
+                const boxIndex = parseInt(btn.dataset.box);
+                const gameIndex = parseInt(btn.dataset.game);
+                const variationIndex = parseInt(btn.dataset.variation || 0);
                 loadGameInEditor(boxIndex, gameIndex, variationIndex);
             });
         });
@@ -2798,18 +3972,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Charger un jeu dans l'éditeur
     function loadGameInEditor(boxIndex, gameIndex, variationIndex = 0) {
-        console.log('📝 loadGameInEditor appelé:', { boxIndex, gameIndex, variationIndex });
-
         adminCurrentBox = boxIndex;
         adminCurrentGameIndex = gameIndex;
         adminCurrentVariation = variationIndex;
 
         const gameOrVariations = boxesData[boxIndex].games[gameIndex];
-        console.log('📦 gameOrVariations:', { isArray: Array.isArray(gameOrVariations), length: Array.isArray(gameOrVariations) ? gameOrVariations.length : 'N/A' });
 
         // Si c'est un tableau de variations, on édite la variation spécifiée
         const game = Array.isArray(gameOrVariations) ? gameOrVariations[variationIndex] : gameOrVariations;
-        console.log('🎮 Game chargé:', { title: game?.title, question: game?.question, variationIndex });
 
         if (!game || !game.type) {
             showCustomAlert('❌ Erreur : Jeu invalide');
@@ -2916,22 +4086,10 @@ window.addEventListener('DOMContentLoaded', () => {
                 container.appendChild(itemDiv);
             });
         } else if (game.type === 'puzzle-text') {
-            container.innerHTML = '<label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Morceaux du puzzle (dans le bon ordre)</label>';
-
-            game.pieces.forEach((piece, index) => {
-                const pieceDiv = document.createElement('div');
-                pieceDiv.className = 'flex items-center gap-2 mb-2';
-                pieceDiv.innerHTML = `
-                    <span class="text-gray-600 dark:text-gray-400 font-semibold w-8">${index + 1}.</span>
-                    <input
-                        type="text"
-                        class="admin-puzzle-piece-input flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white text-base"
-                        data-index="${index}"
-                        value="${piece}"
-                    >
-                `;
-                container.appendChild(pieceDiv);
-            });
+            container.innerHTML = `
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Texte du puzzle</label>
+                <textarea id="admin-puzzle-text" rows="4" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white text-base">${game.text || ''}</textarea>
+            `;
         }
     }
 
@@ -2965,21 +4123,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     placeholder="Ex: 0,2,3"
                 >
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Les bonnes réponses sont : ${correctAnswersArray.map(i => game.options[i]).join(', ')}</p>
-            `;
-        } else if (game.type === 'sequence' || game.type === 'puzzle-text') {
-            const correctOrder = game.correctOrder || [];
-            const items = game.items || game.pieces || [];
-            const orderedItems = correctOrder.map(i => items[i] || `[${i}]`).join(' → ');
-            container.innerHTML = `
-                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Ordre correct (indices séparés par des virgules)</label>
-                <input
-                    type="text"
-                    id="admin-correctOrder"
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white text-base"
-                    value="${correctOrder.join(',')}"
-                    placeholder="Ex: 0,1,2,3"
-                >
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Ordre actuel : ${orderedItems || 'Non défini'}</p>
             `;
         }
     }
@@ -3032,21 +4175,8 @@ window.addEventListener('DOMContentLoaded', () => {
         } else if (game.type === 'sequence') {
             const sequenceInputs = document.querySelectorAll('.admin-sequence-input');
             game.items = Array.from(sequenceInputs).map(input => input.value);
-            // Sauvegarder l'ordre correct
-            const correctOrderInput = document.getElementById('admin-correctOrder');
-            if (correctOrderInput) {
-                const correctOrderStr = correctOrderInput.value;
-                game.correctOrder = correctOrderStr.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-            }
         } else if (game.type === 'puzzle-text') {
-            const puzzlePieceInputs = document.querySelectorAll('.admin-puzzle-piece-input');
-            game.pieces = Array.from(puzzlePieceInputs).map(input => input.value);
-            // Sauvegarder l'ordre correct
-            const correctOrderInput = document.getElementById('admin-correctOrder');
-            if (correctOrderInput) {
-                const correctOrderStr = correctOrderInput.value;
-                game.correctOrder = correctOrderStr.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-            }
+            game.text = document.getElementById('admin-puzzle-text').value;
         }
 
         playSound('success');
@@ -3064,65 +4194,6 @@ window.addEventListener('DOMContentLoaded', () => {
         adminCurrentBox = null;
         adminCurrentGameIndex = null;
         adminCurrentVariation = null;
-    });
-
-    // Bouton Supprimer
-    document.getElementById('admin-delete-btn').addEventListener('click', () => {
-        if (adminCurrentBox === null || adminCurrentGameIndex === null) return;
-
-        const gameOrVariations = boxesData[adminCurrentBox].games[adminCurrentGameIndex];
-        const variationIndex = adminCurrentVariation || 0;
-        const isArray = Array.isArray(gameOrVariations);
-        const totalVariations = isArray ? gameOrVariations.length : 1;
-
-        let confirmMessage = '';
-        if (isArray && totalVariations > 1) {
-            confirmMessage = `Voulez-vous supprimer la variante ${variationIndex + 1}/${totalVariations} de ce jeu ?`;
-        } else {
-            confirmMessage = `Voulez-vous supprimer ce jeu ? Cette action est irréversible.`;
-        }
-
-        // Créer une modal de confirmation personnalisée
-        const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-        modal.innerHTML = `
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
-                <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">⚠️ Confirmation de suppression</h3>
-                <p class="text-gray-700 dark:text-gray-300 mb-6">${confirmMessage}</p>
-                <div class="flex justify-end space-x-3">
-                    <button id="modal-cancel" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">Annuler</button>
-                    <button id="modal-confirm" class="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded">Supprimer</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-
-        document.getElementById('modal-cancel').onclick = () => {
-            playSound('tick');
-            modal.remove();
-        };
-
-        document.getElementById('modal-confirm').onclick = () => {
-            if (isArray && totalVariations > 1) {
-                // Supprimer uniquement la variante
-                boxesData[adminCurrentBox].games[adminCurrentGameIndex].splice(variationIndex, 1);
-                playSound('success');
-                showCustomAlert(`✅ Variante ${variationIndex + 1} supprimée avec succès !`);
-            } else {
-                // Supprimer tout le jeu
-                boxesData[adminCurrentBox].games.splice(adminCurrentGameIndex, 1);
-                playSound('success');
-                showCustomAlert('✅ Jeu supprimé avec succès !');
-            }
-
-            modal.remove();
-            document.getElementById('admin-no-selection').classList.remove('hidden');
-            document.getElementById('admin-edit-form').classList.add('hidden');
-            adminCurrentBox = null;
-            adminCurrentGameIndex = null;
-            adminCurrentVariation = null;
-            renderAdminBoxesList();
-        };
     });
 
     // Bouton Exporter
@@ -3277,17 +4348,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 () => {
                     const count = applyTimeMultiplier(multiplier);
                     updateTimingStats();
-
-                    // Sauvegarder dans Firebase
-                    saveBoxesDataToFirebase()
-                        .then(() => {
-                            playSound('success');
-                            showCustomAlert(`✅ ${count} jeux ont été mis à jour et sauvegardés !`);
-                        })
-                        .catch(() => {
-                            playSound('success');
-                            showCustomAlert(`✅ ${count} jeux mis à jour (sauvegarde Firebase échouée)`);
-                        });
+                    playSound('success');
+                    showCustomAlert(`✅ ${count} jeux ont été mis à jour !`);
                 }
             );
         });
@@ -3307,17 +4369,8 @@ window.addEventListener('DOMContentLoaded', () => {
             () => {
                 const count = applyTimeMultiplier(multiplier);
                 updateTimingStats();
-
-                // Sauvegarder dans Firebase
-                saveBoxesDataToFirebase()
-                    .then(() => {
-                        playSound('success');
-                        showCustomAlert(`✅ ${count} jeux ont été mis à jour et sauvegardés !`);
-                    })
-                    .catch(() => {
-                        playSound('success');
-                        showCustomAlert(`✅ ${count} jeux mis à jour (sauvegarde Firebase échouée)`);
-                    });
+                playSound('success');
+                showCustomAlert(`✅ ${count} jeux ont été mis à jour !`);
             }
         );
     });
@@ -3336,17 +4389,8 @@ window.addEventListener('DOMContentLoaded', () => {
             () => {
                 const count = applyFixedTime(time);
                 updateTimingStats();
-
-                // Sauvegarder dans Firebase
-                saveBoxesDataToFirebase()
-                    .then(() => {
-                        playSound('success');
-                        showCustomAlert(`✅ ${count} jeux ont été mis à jour à ${time}s et sauvegardés !`);
-                    })
-                    .catch(() => {
-                        playSound('success');
-                        showCustomAlert(`✅ ${count} jeux mis à jour à ${time}s (sauvegarde Firebase échouée)`);
-                    });
+                playSound('success');
+                showCustomAlert(`✅ ${count} jeux ont été mis à jour à ${time}s !`);
             }
         );
     });
@@ -3402,24 +4446,7 @@ function safeUpdateDisplay() {
 
 function updateSupervisorDisplay() {
     const container = document.getElementById('teams-progress-container');
-
-    // DEBUG: Afficher TOUTES les équipes reçues
-    console.log('🔍 Toutes les équipes Firebase:', teams);
-    console.log('🆔 trainingSessionId du superviseur:', trainingSessionId);
-
-    // Filtrer seulement les équipes de cette session de formation
-    const teamsArray = Object.values(teams).filter(t => {
-        console.log(`🔎 Vérification équipe "${t.teamName}": trainingSessionId="${t.trainingSessionId}" vs superviseur="${trainingSessionId}" → ${t.trainingSessionId === trainingSessionId}`);
-        return t.trainingSessionId === trainingSessionId;
-    });
-
-    console.log('📊 Mise à jour superviseur:', {
-        trainingSessionId: trainingSessionId,
-        totalTeams: teamsArray.length,
-        teamNames: teamsArray.map(t => t.teamName),
-        allTeams: Object.keys(teams).length,
-        filteredTeams: teamsArray.length
-    });
+    const teamsArray = Object.values(teams);
 
     // Compter les équipes actives et terminées
     const activeTeams = teamsArray.filter(t => !t.isFinished).length;
@@ -3507,8 +4534,8 @@ function updateSupervisorDisplay() {
             `;
         }
 
-        // Vérifier si l'équipe est en pause (après chaque coffre et pas terminé ET pause pas levée)
-        const isPaused = !team.isFinished && team.boxesUnlocked > 0 && team.boxesUnlocked < boxesData.length && !team.pauseLifted;
+        // Vérifier si l'équipe est en pause (multiples de 2 coffres et pas terminé ET pause pas levée)
+        const isPaused = !team.isFinished && team.boxesUnlocked % 2 === 0 && team.boxesUnlocked > 0 && team.boxesUnlocked < boxesData.length && !team.pauseLifted;
 
         teamDiv.innerHTML = `
             <div class="glass-morphism rounded-2xl p-4 shadow-xl relative">
@@ -3517,7 +4544,7 @@ function updateSupervisorDisplay() {
                     <div class="text-lg font-bold text-gray-800 dark:text-white">${team.teamName}</div>
                     <div class="text-sm text-gray-600 dark:text-gray-400">${team.totalScore} pts</div>
                     ${team.isFinished ? '<div class="text-xs text-green-600 font-semibold">✓ Terminé</div>' : ''}
-                    ${isPaused ? '<div class="text-xs text-orange-600 dark:text-orange-400 font-semibold animate-pulse">⏸️ En pause (Étape ' + team.boxesUnlocked + ')</div>' : ''}
+                    ${isPaused ? '<div class="text-xs text-orange-600 dark:text-orange-400 font-semibold animate-pulse">⏸️ En pause (Étape ' + (team.boxesUnlocked / 2) + ')</div>' : ''}
                 </div>
 
                 <div class="progress-bar-vertical">
@@ -3535,8 +4562,10 @@ function updateSupervisorDisplay() {
         container.appendChild(teamDiv);
     });
 
-    // Mettre à jour le classement en temps réel
-    updateSupervisorRanking(teamsArray, finishedTeams === teamsArray.length && teamsArray.length > 0);
+    // Afficher le classement final si toutes les équipes ont terminé
+    if (finishedTeams > 0 && finishedTeams === teamsArray.length && teamsArray.length > 0) {
+        showFinalRanking();
+    }
 }
 
 // Variable pour éviter plusieurs listeners
@@ -3605,96 +4634,48 @@ function updatePauseButton(stages) {
     if (stageDisplay) stageDisplay.classList.add('hidden');
 }
 
-// Mettre à jour le classement sur la page superviseur
-function updateSupervisorRanking(teamsArray, isAllFinished) {
-    console.log('📊 updateSupervisorRanking appelée:', { teamsArray, isAllFinished });
+function showFinalRanking() {
+    const rankingDiv = document.getElementById('final-ranking');
+    const rankingList = document.getElementById('ranking-list');
 
-    const rankingTitle = document.getElementById('ranking-title');
-    const rankingList = document.getElementById('supervisor-ranking-list');
+    rankingDiv.classList.remove('hidden');
 
-    if (!rankingList) {
-        console.error('❌ Élément supervisor-ranking-list introuvable');
-        return;
-    }
-
-    // Filtrer uniquement les équipes de cette session
-    const sessionTeams = teamsArray.filter(team => team.boxesUnlocked > 0);
-
-    if (sessionTeams.length === 0) {
-        rankingList.innerHTML = '<div class="text-center text-gray-500 dark:text-gray-400">En attente des équipes...</div>';
-        return;
-    }
-
-    // Trier par score décroissant, puis par temps de fin si terminé
-    const sortedTeams = [...sessionTeams].sort((a, b) => {
+    // Trier les équipes par score décroissant, puis par temps
+    const sortedTeams = Object.values(teams).sort((a, b) => {
         if (b.totalScore !== a.totalScore) {
             return b.totalScore - a.totalScore;
         }
-        // Si même score, trier par temps de fin (plus rapide = meilleur)
         return (a.finishTime || Infinity) - (b.finishTime || Infinity);
     });
 
-    // Si toutes les équipes ont fini, afficher "Classement Final" et célébrer
-    if (isAllFinished) {
-        if (rankingTitle) {
-            rankingTitle.innerHTML = '🏆 Classement Final 🏆';
-        }
-
-        // Déclencher la célébration (une seule fois)
-        if (!window.finalCelebrationTriggered) {
-            window.finalCelebrationTriggered = true;
-            console.log('🎉 TOUTES LES ÉQUIPES ONT TERMINÉ - Célébration finale !');
-            createConfetti();
-            playSound('applause');
-            setTimeout(() => {
-                playSound('complete');
-            }, 300);
-        }
-    } else {
-        if (rankingTitle) {
-            rankingTitle.textContent = '🏆 Classement Provisoire';
-        }
-        // Réinitialiser le flag si ce n'est plus terminé (reset)
-        window.finalCelebrationTriggered = false;
-    }
-
-    // Afficher le classement
     rankingList.innerHTML = '';
-    sortedTeams.forEach((team, index) => {
-        const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
-        const rankingItem = document.createElement('div');
-        rankingItem.className = `flex justify-between items-center p-4 rounded-lg ${
-            index === 0 ? 'bg-yellow-100 dark:bg-yellow-900/50 border-2 border-yellow-400' :
-            index === 1 ? 'bg-gray-100 dark:bg-gray-700 border-2 border-gray-400' :
-            index === 2 ? 'bg-orange-100 dark:bg-orange-900/50 border-2 border-orange-400' :
-            'bg-gray-50 dark:bg-gray-800'
-        } bounce-in`;
-        rankingItem.style.animationDelay = `${index * 0.05}s`;
 
-        const duration = team.finishTime && team.stats?.startTime ?
+    sortedTeams.forEach((team, index) => {
+        const rank = index + 1;
+        const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+
+        const duration = team.finishTime && team.stats.startTime ?
             Math.round((team.finishTime - team.stats.startTime) / 1000) : 0;
 
-        rankingItem.innerHTML = `
-            <div class="flex items-center gap-3">
-                <span class="text-3xl">${medal}</span>
-                <div>
-                    <div class="font-bold text-lg text-gray-800 dark:text-white">${team.teamName}</div>
-                    ${team.isFinished ? '<div class="text-xs text-green-600 dark:text-green-400 font-semibold">✓ Terminé' + (duration > 0 ? ` en ${duration}s` : '') + '</div>' : '<div class="text-xs text-blue-600 dark:text-blue-400">En cours...</div>'}
+        const rankItem = document.createElement('div');
+        rankItem.className = 'glass-morphism rounded-2xl p-6 flex items-center gap-6 bounce-in';
+        rankItem.style.animationDelay = `${index * 0.1}s`;
+
+        rankItem.innerHTML = `
+            <div class="ranking-badge ${rankClass}">
+                ${medal}
+            </div>
+            <div class="flex-1">
+                <div class="text-2xl font-bold text-gray-800 dark:text-white">${team.teamName}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                    ${team.totalScore} points • ${duration}s • ${team.stats.gamesWon}/${team.stats.gamesWon + team.stats.gamesLost} réussis
                 </div>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="text-right">
-                    <div class="text-2xl font-bold text-primary">${team.totalScore}</div>
-                    <div class="text-xs text-gray-600 dark:text-gray-400">points</div>
-                </div>
-                <div class="text-right">
-                    <div class="text-lg font-semibold text-gray-700 dark:text-gray-300">${team.boxesUnlocked}/4</div>
-                    <div class="text-xs text-gray-600 dark:text-gray-400">coffres</div>
-                </div>
-            </div>
+            <div class="text-3xl">${rank === 1 ? '🎉' : rank === 2 ? '👏' : rank === 3 ? '👍' : '✨'}</div>
         `;
 
-        rankingList.appendChild(rankingItem);
+        rankingList.appendChild(rankItem);
     });
 }
 
@@ -3751,15 +4732,15 @@ function renderBoxes() {
         if (isCurrent || isUnlocked) {
             boxElement.addEventListener('click', () => {
                 // Vérifier si on est en pause AVANT de permettre de jouer
-                const isPausedNow = gameState.boxesUnlocked > 0 && gameState.boxesUnlocked < boxesData.length && !gameState.pauseLifted;
+                const isPausedNow = gameState.boxesUnlocked % 2 === 0 && gameState.boxesUnlocked > 0 && gameState.boxesUnlocked < boxesData.length && !gameState.pauseLifted;
 
                 if (isPausedNow && index === gameState.boxesUnlocked) {
                     // On est en pause et on essaie de cliquer sur le coffre suivant
-                    console.log('🚫 Clic bloqué - En pause à l\'étape', gameState.boxesUnlocked);
+                    console.log('🚫 Clic bloqué - En pause à l\'étape', gameState.boxesUnlocked / 2);
                     playSound('wrong');
                     showCustomAlert('⏸️ Le jeu est en pause ! Attendez que le formateur reprenne le jeu.');
                     // Afficher l'écran de pause au cas où l'utilisateur serait revenu aux coffres manuellement
-                    const stageNumber = gameState.boxesUnlocked;
+                    const stageNumber = gameState.boxesUnlocked / 2;
                     showStagePauseScreen(stageNumber);
                     return;
                 }
@@ -4838,33 +5819,28 @@ function validateAnswer(isCorrect) {
         // 1. Afficher d'abord un message simple (flash 1,5s)
         showFeedback(`✓ Bonne réponse !`, 'success');
 
-        // Adapter les délais selon s'il y a une explication ou non
-        const hasExplanation = currentGame.explanation && currentGame.explanation.trim().length > 0;
-        const pointsDelay = hasExplanation ? 6500 : 1500; // Avec explication: 6.5s, sans: 1.5s
-        const nextGameDelay = hasExplanation ? 8000 : 3000; // Avec explication: 8s, sans: 3s
-
-        // 2. Afficher l'explication si elle existe (après 1.5s, pendant 5s)
-        if (hasExplanation) {
-            setTimeout(() => {
+        // 2. Attendre 1.5s puis afficher l'explication pendant 3 secondes
+        setTimeout(() => {
+            if (currentGame.explanation) {
                 const correctAnswerHTML = getCorrectAnswerText(currentGame);
                 const explanationHTML = `
                     ${correctAnswerHTML}
-                    <div class="mt-4 text-base leading-relaxed">${currentGame.explanation}</div>
+                    ${currentGame.explanation ? `<div class="mt-4 text-base leading-relaxed">${currentGame.explanation}</div>` : ''}
                 `;
                 showFeedbackWithAnswer(`📖 Explication`, explanationHTML, 'success');
-            }, 1500);
-        }
+            }
+        }, 1500);
 
-        // 3. Afficher les points (timing adapté selon présence d'explication)
+        // 3. Attendre 4.5s (1.5 + 3) puis afficher le panneau de points simple (flash 1,5s)
         setTimeout(() => {
             showFeedback(`🎉 +${points} points !`, 'success');
-        }, pointsDelay);
+        }, 4500);
 
-        // 4. Charger le prochain jeu (timing adapté selon présence d'explication)
+        // 4. Charger le prochain jeu après 6 secondes total (1.5 + 3 + 1.5)
         setTimeout(() => {
             gameState.currentGameIndex++;
             loadBoxGame();
-        }, nextGameDelay);
+        }, 6000);
     } else {
         playSound('wrong'); // Son "wrong" au lieu de "error"
         gameState.attempts--;
@@ -4907,7 +5883,7 @@ function showFeedbackWithAnswer(message, answerHTML, type) {
         </div>
     `;
     document.body.appendChild(feedback);
-    setTimeout(() => feedback.remove(), 5000); // Explication visible 5 secondes
+    setTimeout(() => feedback.remove(), 3000); // Réduit à 3 secondes
 }
 
 function unlockBox() {
@@ -4933,11 +5909,12 @@ function unlockBox() {
 
     broadcastUpdate();
 
-    // Vérifier si on doit mettre en pause après CHAQUE coffre (4 pauses au total)
-    const shouldPause = gameState.boxesUnlocked < boxesData.length;
+    // Vérifier si on doit mettre en pause après 2 coffres (étapes de 2 coffres)
+    const shouldPause = gameState.boxesUnlocked % 2 === 0 && gameState.boxesUnlocked < boxesData.length;
 
     console.log('🔍 Vérification pause:', {
         boxesUnlocked: gameState.boxesUnlocked,
+        modulo: gameState.boxesUnlocked % 2,
         totalBoxes: boxesData.length,
         shouldPause: shouldPause
     });
@@ -4951,8 +5928,8 @@ function unlockBox() {
             console.log('🏁 Fin du jeu - tous les coffres déverrouillés');
             endGame();
         } else if (shouldPause) {
-            // Mise en pause automatique après chaque coffre
-            const stageNumber = gameState.boxesUnlocked;
+            // Mise en pause automatique après 2 coffres
+            const stageNumber = gameState.boxesUnlocked / 2;
             console.log(`⏸️ AFFICHAGE ÉCRAN DE PAUSE - Étape ${stageNumber}`);
             showStagePauseScreen(stageNumber);
         } else {
@@ -5102,7 +6079,7 @@ function updateStageRankings(stageNumber) {
 
         Object.keys(allTeams).forEach(teamKey => {
             const team = allTeams[teamKey];
-            if (team.trainingSessionId === trainingSessionId && team.boxesUnlocked >= requiredBoxes) {
+            if (team.sessionId === sessionId && team.boxesUnlocked >= requiredBoxes) {
                 teamsArray.push({
                     name: team.teamName,
                     score: team.totalScore,
