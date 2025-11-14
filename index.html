@@ -216,7 +216,7 @@
 
 // Fonction pour afficher/cacher les écrans
 function showLevelScreen(screenId) {
-    const screens = ['level-selection-screen', 'auth-screen', 'login-screen', 'player-entry-screen', 'supervisor-screen', 'boxes-screen', 'game-screen', 'end-screen', 'admin-screen'];
+    const screens = ['level-selection-screen', 'auth-screen', 'login-screen', 'player-entry-screen', 'supervisor-screen', 'boxes-screen', 'game-screen', 'end-screen', 'stage-pause-screen', 'admin-screen'];
     screens.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
@@ -461,7 +461,15 @@ setTimeout(addBackButton, 100);
                 <!-- Les barres seront générées ici -->
             </div>
 
-            <!-- Classement final -->
+            <!-- Classement provisoire/final -->
+            <div id="supervisor-ranking" class="mt-8 glass-morphism rounded-3xl shadow-2xl p-8">
+                <h2 id="ranking-title" class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-6">🏆 Classement Provisoire</h2>
+                <div id="supervisor-ranking-list" class="space-y-4">
+                    <!-- Le classement sera généré ici -->
+                </div>
+            </div>
+
+            <!-- Classement final (ancien, gardé pour compatibilité) -->
             <div id="final-ranking" class="hidden mt-8 glass-morphism rounded-3xl shadow-2xl p-8">
                 <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-6">🏆 Classement Final</h2>
                 <div id="ranking-list" class="space-y-4">
@@ -532,6 +540,40 @@ setTimeout(addBackButton, 100);
                 </button>
                 <button id="reset-answer-btn" class="hidden px-6 bg-gradient-to-r from-orange-500 to-red-600 text-white text-xl font-bold py-5 rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
                     🔄 Réinitialiser
+                </button>
+            </div>
+        </div>
+
+        <!-- Écran de pause entre les coffres -->
+        <div id="stage-pause-screen" class="hidden max-w-4xl mx-auto text-center">
+            <div class="glass-morphism rounded-3xl shadow-2xl p-8 md:p-12 bounce-in">
+                <div class="text-7xl mb-6">⏸️</div>
+                <h1 class="text-4xl md:text-5xl font-bold text-primary neon-text mb-4">Pause Stratégique !</h1>
+                <p class="text-xl text-gray-700 dark:text-gray-300 mb-8">Coffre <span id="stage-number" class="text-primary font-bold">1</span> complété !</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl p-6 shadow-xl">
+                        <div class="text-5xl font-bold mb-2" id="stage-score">0</div>
+                        <div class="text-lg font-semibold">Points Actuels</div>
+                    </div>
+                    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl p-6 shadow-xl">
+                        <div class="text-5xl font-bold mb-2" id="stage-boxes-unlocked">0</div>
+                        <div class="text-lg font-semibold">Coffres Ouverts</div>
+                    </div>
+                    <div class="bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-2xl p-6 shadow-xl">
+                        <div class="text-5xl font-bold mb-2" id="stage-boxes-remaining">0</div>
+                        <div class="text-lg font-semibold">Restants</div>
+                    </div>
+                </div>
+
+                <div class="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-400 dark:border-yellow-600 rounded-2xl p-6 mb-8">
+                    <p class="text-lg text-yellow-800 dark:text-yellow-200 font-semibold">
+                        💡 Profitez de cette pause pour vous concentrer. Le prochain coffre vous attend !
+                    </p>
+                </div>
+
+                <button id="continue-stage-btn" class="bg-gradient-to-r from-primary via-purple-600 to-pink-600 text-white text-2xl font-bold py-6 px-12 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 glow">
+                    ▶️ Continuer l'Aventure
                 </button>
             </div>
         </div>
@@ -818,8 +860,8 @@ async function hashPassword(password) {
 // Mot de passe unique pour accéder à l'application
 const MASTER_PASSWORD_HASH = 'd203a5ec80cba930926704ea5e0ed009acf71190a76faf5920e318a4aee5dbef'; // MiBSSIAP
 
-// Données des questions par niveau
-const BOXES_DATA_BY_LEVEL = {
+// Données par défaut des questions par niveau
+const DEFAULT_BOXES_DATA_BY_LEVEL = {
     1: [
     {
         "title": "Le Feu",
@@ -7715,6 +7757,87 @@ const BOXES_DATA_BY_LEVEL = {
 ]
 };
 
+// ==================== PERSISTENCE DES MODIFICATIONS ADMIN ====================
+
+// Sauvegarder les modifications dans Firebase
+function saveBoxesDataToFirebase() {
+    if (!database) {
+        console.error('❌ Firebase non initialisé');
+        return Promise.reject('Firebase non initialisé');
+    }
+
+    try {
+        const dataToSave = JSON.stringify(BOXES_DATA_BY_LEVEL);
+        return database.ref('admin_config/ssiap_cup_data').set(dataToSave)
+            .then(() => {
+                console.log('✅ Modifications sauvegardées dans Firebase');
+                return true;
+            })
+            .catch(error => {
+                console.error('❌ Erreur lors de la sauvegarde Firebase:', error);
+                return false;
+            });
+    } catch (error) {
+        console.error('❌ Erreur lors de la sauvegarde:', error);
+        return Promise.reject(error);
+    }
+}
+
+// Charger les données modifiées depuis Firebase
+function loadBoxesDataFromFirebase() {
+    if (!database) {
+        console.log('⚠️ Firebase non initialisé, utilisation des données par défaut');
+        return Promise.resolve(null);
+    }
+
+    return database.ref('admin_config/ssiap_cup_data').once('value')
+        .then(snapshot => {
+            const savedData = snapshot.val();
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    console.log('📥 Données modifiées chargées depuis Firebase');
+                    return parsed;
+                } catch (error) {
+                    console.error('❌ Erreur parsing données Firebase:', error);
+                    return null;
+                }
+            }
+            return null;
+        })
+        .catch(error => {
+            console.error('❌ Erreur lors du chargement Firebase:', error);
+            return null;
+        });
+}
+
+// Réinitialiser aux données par défaut
+function resetToDefaultData() {
+    if (!database) {
+        console.error('❌ Firebase non initialisé');
+        return Promise.reject('Firebase non initialisé');
+    }
+
+    return database.ref('admin_config/ssiap_cup_data').remove()
+        .then(() => {
+            console.log('🔄 Données réinitialisées aux valeurs par défaut');
+            // Recharger les données par défaut
+            Object.keys(BOXES_DATA_BY_LEVEL).forEach(level => {
+                BOXES_DATA_BY_LEVEL[level] = JSON.parse(JSON.stringify(DEFAULT_BOXES_DATA_BY_LEVEL[level]));
+            });
+            // Mettre à jour boxesData avec le niveau actuel
+            boxesData = BOXES_DATA_BY_LEVEL[currentLevel];
+            return true;
+        })
+        .catch(error => {
+            console.error('❌ Erreur lors de la réinitialisation:', error);
+            return false;
+        });
+}
+
+// Initialiser BOXES_DATA_BY_LEVEL (sera chargé depuis Firebase après l'init)
+let BOXES_DATA_BY_LEVEL = JSON.parse(JSON.stringify(DEFAULT_BOXES_DATA_BY_LEVEL)); // Deep copy par défaut
+
 // Variables globales pour le niveau sélectionné
 let currentLevel = 1; // Niveau sélectionné par défaut
 let boxesData = BOXES_DATA_BY_LEVEL[1];
@@ -7842,6 +7965,50 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+// Charger les données modifiées depuis Firebase (si elles existent)
+loadBoxesDataFromFirebase()
+    .then(loadedData => {
+        if (loadedData) {
+            Object.keys(loadedData).forEach(level => {
+                BOXES_DATA_BY_LEVEL[level] = loadedData[level];
+            });
+            // Mettre à jour boxesData avec le niveau actuel
+            boxesData = BOXES_DATA_BY_LEVEL[currentLevel];
+            console.log('🎮 Données du jeu chargées depuis Firebase');
+        } else {
+            console.log('🎮 Utilisation des données par défaut');
+        }
+    })
+    .catch(error => {
+        console.error('❌ Erreur chargement données:', error);
+        console.log('🎮 Utilisation des données par défaut');
+    });
+
+// Écouter les modifications admin en temps réel
+database.ref('admin_config/ssiap_cup_data').on('value', (snapshot) => {
+    const savedData = snapshot.val();
+    if (savedData) {
+        try {
+            const parsed = JSON.parse(savedData);
+            Object.keys(parsed).forEach(level => {
+                BOXES_DATA_BY_LEVEL[level] = parsed[level];
+            });
+            // Mettre à jour boxesData avec le niveau actuel
+            boxesData = BOXES_DATA_BY_LEVEL[currentLevel];
+            console.log('🔄 Données du jeu mises à jour en temps réel depuis Firebase');
+        } catch (error) {
+            console.error('❌ Erreur parsing données temps réel:', error);
+        }
+    } else {
+        // Les données ont été supprimées (réinitialisation)
+        Object.keys(DEFAULT_BOXES_DATA_BY_LEVEL).forEach(level => {
+            BOXES_DATA_BY_LEVEL[level] = JSON.parse(JSON.stringify(DEFAULT_BOXES_DATA_BY_LEVEL[level]));
+        });
+        boxesData = BOXES_DATA_BY_LEVEL[currentLevel];
+        console.log('🔄 Données réinitialisées aux valeurs par défaut');
+    }
+});
+
 // ==================== SYSTÈME MULTIJOUEUR ====================
 
 // ID unique pour cette session
@@ -7956,6 +8123,29 @@ function playSound(type, frequency = null) {
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.1);
             break;
+        case 'applause':
+            // Fanfare festive pour célébration finale
+            const celebrationNotes = [
+                { freq: 523.25, time: 0 },      // C5
+                { freq: 659.25, time: 0.12 },   // E5
+                { freq: 783.99, time: 0.24 },   // G5
+                { freq: 1046.50, time: 0.36 },  // C6
+                { freq: 783.99, time: 0.5 },    // G5
+                { freq: 1046.50, time: 0.62 }   // C6
+            ];
+            celebrationNotes.forEach(note => {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(note.freq, audioContext.currentTime + note.time);
+                gain.gain.setValueAtTime(0.2, audioContext.currentTime + note.time);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + note.time + 0.15);
+                osc.start(audioContext.currentTime + note.time);
+                osc.stop(audioContext.currentTime + note.time + 0.15);
+            });
+            return;
     }
 }
 
@@ -8674,6 +8864,13 @@ window.addEventListener('DOMContentLoaded', () => {
         broadcastUpdate();
     });
 
+    // Bouton continuer depuis l'écran de pause
+    document.getElementById('continue-stage-btn').addEventListener('click', () => {
+        playSound('tick');
+        showScreen('boxes-screen');
+        renderBoxes();
+    });
+
     // Bouton Arrêter le jeu (Superviseur)
     document.getElementById('stop-all-games-btn').addEventListener('click', () => {
         showConfirmDialog(
@@ -8734,7 +8931,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Afficher l'écran ADMIN
     function showAdminScreen() {
-        const screens = ['login-screen', 'player-entry-screen', 'supervisor-screen', 'boxes-screen', 'game-screen', 'end-screen', 'admin-screen'];
+        const screens = ['login-screen', 'player-entry-screen', 'supervisor-screen', 'boxes-screen', 'game-screen', 'end-screen', 'stage-pause-screen', 'admin-screen'];
         screens.forEach(id => {
             document.getElementById(id).classList.add('hidden');
         });
@@ -9365,8 +9562,17 @@ window.addEventListener('DOMContentLoaded', () => {
                 () => {
                     const count = applyTimeMultiplier(multiplier);
                     updateTimingStats();
-                    playSound('success');
-                    showCustomAlert(`✅ ${count} jeux ont été mis à jour !`);
+
+                    // Sauvegarder dans Firebase
+                    saveBoxesDataToFirebase()
+                        .then(() => {
+                            playSound('success');
+                            showCustomAlert(`✅ ${count} jeux ont été mis à jour et sauvegardés !`);
+                        })
+                        .catch(() => {
+                            playSound('success');
+                            showCustomAlert(`✅ ${count} jeux mis à jour (sauvegarde Firebase échouée)`);
+                        });
                 }
             );
         });
@@ -9386,8 +9592,17 @@ window.addEventListener('DOMContentLoaded', () => {
             () => {
                 const count = applyTimeMultiplier(multiplier);
                 updateTimingStats();
-                playSound('success');
-                showCustomAlert(`✅ ${count} jeux ont été mis à jour !`);
+
+                // Sauvegarder dans Firebase
+                saveBoxesDataToFirebase()
+                    .then(() => {
+                        playSound('success');
+                        showCustomAlert(`✅ ${count} jeux ont été mis à jour et sauvegardés !`);
+                    })
+                    .catch(() => {
+                        playSound('success');
+                        showCustomAlert(`✅ ${count} jeux mis à jour (sauvegarde Firebase échouée)`);
+                    });
             }
         );
     });
@@ -9406,8 +9621,17 @@ window.addEventListener('DOMContentLoaded', () => {
             () => {
                 const count = applyFixedTime(time);
                 updateTimingStats();
-                playSound('success');
-                showCustomAlert(`✅ ${count} jeux ont été mis à jour à ${time}s !`);
+
+                // Sauvegarder dans Firebase
+                saveBoxesDataToFirebase()
+                    .then(() => {
+                        playSound('success');
+                        showCustomAlert(`✅ ${count} jeux ont été mis à jour à ${time}s et sauvegardés !`);
+                    })
+                    .catch(() => {
+                        playSound('success');
+                        showCustomAlert(`✅ ${count} jeux mis à jour à ${time}s (sauvegarde Firebase échouée)`);
+                    });
             }
         );
     });
@@ -9566,9 +9790,90 @@ function updateSupervisorDisplay() {
     });
 
     // Afficher le classement final si toutes les équipes ont terminé
-    if (finishedTeams > 0 && finishedTeams === teamsArray.length && teamsArray.length > 0) {
+    const isAllFinished = finishedTeams > 0 && finishedTeams === teamsArray.length && teamsArray.length > 0;
+
+    // Mettre à jour le classement provisoire/final
+    updateSupervisorRanking(teamsArray, isAllFinished);
+
+    if (isAllFinished) {
         showFinalRanking();
     }
+}
+
+function updateSupervisorRanking(teamsArray, isAllFinished) {
+    console.log('📊 updateSupervisorRanking appelée:', { teamsArray, isAllFinished });
+    const rankingTitle = document.getElementById('ranking-title');
+    const rankingList = document.getElementById('supervisor-ranking-list');
+
+    if (!rankingList) {
+        console.error('❌ Élément supervisor-ranking-list introuvable');
+        return;
+    }
+
+    const sessionTeams = teamsArray.filter(team => team.boxesUnlocked > 0);
+
+    if (sessionTeams.length === 0) {
+        rankingList.innerHTML = '<div class="text-center text-gray-500 dark:text-gray-400">En attente des équipes...</div>';
+        return;
+    }
+
+    const sortedTeams = [...sessionTeams].sort((a, b) => {
+        if (b.totalScore !== a.totalScore) {
+            return b.totalScore - a.totalScore;
+        }
+        return (a.finishTime || Infinity) - (b.finishTime || Infinity);
+    });
+
+    if (isAllFinished) {
+        if (rankingTitle) {
+            rankingTitle.innerHTML = '🏆 Classement Final 🏆';
+        }
+        if (!window.finalCelebrationTriggered) {
+            window.finalCelebrationTriggered = true;
+            console.log('🎉 TOUTES LES ÉQUIPES ONT TERMINÉ - Célébration finale !');
+            createConfetti();
+            playSound('applause');
+            setTimeout(() => {
+                playSound('complete');
+            }, 300);
+        }
+    } else {
+        if (rankingTitle) {
+            rankingTitle.textContent = '🏆 Classement Provisoire';
+        }
+        window.finalCelebrationTriggered = false;
+    }
+
+    rankingList.innerHTML = '';
+    sortedTeams.forEach((team, index) => {
+        const rank = index + 1;
+        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
+
+        const rankItem = document.createElement('div');
+        rankItem.className = `flex justify-between items-center p-4 rounded-lg ${
+            rank === 1 ? 'bg-yellow-100 dark:bg-yellow-900' :
+            rank === 2 ? 'bg-gray-100 dark:bg-gray-700' :
+            rank === 3 ? 'bg-orange-100 dark:bg-orange-900' :
+            'bg-white dark:bg-gray-800'
+        } shadow-md`;
+
+        const finishBadge = team.isFinished ?
+            '<span class="text-xs bg-green-500 text-white px-2 py-1 rounded-full ml-2">✓ Terminé</span>' :
+            '<span class="text-xs bg-blue-500 text-white px-2 py-1 rounded-full ml-2">En cours</span>';
+
+        rankItem.innerHTML = `
+            <div class="flex items-center gap-3">
+                <div class="text-2xl font-bold">${medal}</div>
+                <div>
+                    <div class="font-bold text-gray-800 dark:text-white">${team.teamName}${finishBadge}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">${team.boxesUnlocked} coffres • ${team.totalScore} pts</div>
+                </div>
+            </div>
+            <div class="text-lg font-bold text-gray-700 dark:text-gray-300">${team.totalScore}</div>
+        `;
+
+        rankingList.appendChild(rankItem);
+    });
 }
 
 function showFinalRanking() {
@@ -10759,14 +11064,37 @@ function unlockBox() {
 
     broadcastUpdate();
 
+    // Vérifier si une pause est nécessaire
+    const shouldPause = gameState.boxesUnlocked < boxesData.length;
+
     setTimeout(() => {
         if (gameState.boxesUnlocked >= boxesData.length) {
             endGame();
+        } else if (shouldPause) {
+            // Pause après chaque coffre
+            showStagePauseScreen(gameState.boxesUnlocked);
         } else {
             showScreen('boxes-screen');
             renderBoxes();
         }
     }, 3000);
+}
+
+// Fonction pour afficher l'écran de pause
+function showStagePauseScreen(stageNumber) {
+    stopTimer();
+    playSound('complete');
+
+    console.log(`⏸️ Pause automatique après l'étape ${stageNumber} (${gameState.boxesUnlocked} coffres déverrouillés)`);
+
+    // Afficher l'écran de pause
+    showScreen('stage-pause-screen');
+
+    // Mettre à jour les informations de l'étape
+    document.getElementById('stage-number').textContent = stageNumber;
+    document.getElementById('stage-score').textContent = gameState.totalScore || 0;
+    document.getElementById('stage-boxes-unlocked').textContent = gameState.boxesUnlocked || 0;
+    document.getElementById('stage-boxes-remaining').textContent = (boxesData.length - gameState.boxesUnlocked) || 0;
 }
 
 // ==================== TIMER ====================
