@@ -52,6 +52,50 @@
         body.trainee-connected #trainee-login {
             display: none !important;
         }
+
+        /* Styles pour matching */
+        .matching-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .matching-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .matching-item.selected {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .matching-item.matched {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Styles pour sequence */
+        .sequence-item {
+            cursor: move;
+            user-select: none;
+        }
+
+        .sequence-item.dragging {
+            opacity: 0.5;
+        }
+
+        /* Styles pour quiz-multi */
+        .checkbox-option {
+            cursor: pointer;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
@@ -320,14 +364,22 @@ let timerInterval = null;
 let answersListener = null;
 let selectedAnswer = null;
 
+// Variables pour les nouveaux types de jeux
+let selectedAnswers = []; // Pour quiz-multi
+let matchingPairs = []; // Pour matching
+let sequenceOrder = []; // Pour sequence
+let selectedLeft = null; // Pour matching
+let selectedRight = null; // Pour matching
+
 // Mot de passe superviseur
 const SUPERVISOR_PASSWORD = '3215';
 
-// Questions par niveau SSIAP - Quiz type QCM
+// Questions par niveau SSIAP - Tous types de jeux
 const BOXES_DATA = {
-    1: [ // SSIAP 1 - 20 questions
+    1: [ // SSIAP 1 - 20 questions variées
         // Le Feu (5 questions)
         {
+            type: "quiz",
             title: "Le Feu",
             icon: "🔥",
             color: "from-red-500 to-orange-700",
@@ -344,22 +396,23 @@ const BOXES_DATA = {
             points: 100
         },
         {
-            title: "Le Feu",
+            type: "matching",
+            title: "Classes de Feu",
             icon: "🔥",
             color: "from-red-500 to-orange-700",
-            question: "Comment appelle-t-on l'élément qui brûle dans le triangle du feu ?",
-            options: [
-                "Le combustible",
-                "Le comburant",
-                "L'énergie d'activation",
-                "La flamme"
+            question: "Associez chaque classe de feu avec le bon type de combustible :",
+            pairs: [
+                { left: "Classe A", right: "Solides (bois, papier, tissu)" },
+                { left: "Classe B", right: "Liquides ou solides liquéfiables" },
+                { left: "Classe C", right: "Gaz" },
+                { left: "Classe D", right: "Métaux" }
             ],
-            correctAnswer: 0,
-            explanation: "Le combustible est la matière qui brûle (bois, papier, essence, etc.).",
-            timeLimit: 35,
-            points: 100
+            explanation: "Les classes de feu sont définies selon la nature du combustible.",
+            timeLimit: 60,
+            points: 120
         },
         {
+            type: "quiz",
             title: "Le Feu",
             icon: "🔥",
             color: "from-red-500 to-orange-700",
@@ -376,39 +429,36 @@ const BOXES_DATA = {
             points: 100
         },
         {
+            type: "matching",
+            title: "Modes de Propagation",
+            icon: "🔥",
+            color: "from-red-500 to-orange-700",
+            question: "Associez chaque mode de propagation avec sa définition :",
+            pairs: [
+                { left: "Conduction", right: "Par contact direct" },
+                { left: "Convection", right: "Par déplacement de gaz chauds" },
+                { left: "Rayonnement", right: "Par ondes électromagnétiques" },
+                { left: "Projection", right: "Par projections de matières" }
+            ],
+            explanation: "Il existe 4 modes de propagation de la chaleur lors d'un incendie.",
+            timeLimit: 60,
+            points: 120
+        },
+        {
+            type: "true-false",
             title: "Le Feu",
             icon: "🔥",
             color: "from-red-500 to-orange-700",
-            question: "Quelle est la concentration minimale d'oxygène nécessaire à la combustion ?",
-            options: [
-                "18%",
-                "21%",
-                "15%",
-                "25%"
-            ],
+            question: "La concentration minimale d'oxygène nécessaire à la combustion est de 18% ?",
+            options: ["Vrai", "Faux"],
             correctAnswer: 0,
-            explanation: "En dessous de 18% d'oxygène, la combustion s'arrête progressivement.",
-            timeLimit: 40,
+            explanation: "Vrai. En dessous de 18% d'oxygène, la combustion s'arrête progressivement.",
+            timeLimit: 30,
             points: 100
         },
+        // SSI et Extincteurs (5 questions variées)
         {
-            title: "Le Feu",
-            icon: "🔥",
-            color: "from-red-500 to-orange-700",
-            question: "Pour éteindre un feu, on peut agir sur :",
-            options: [
-                "Un ou plusieurs éléments du triangle du feu",
-                "Uniquement le combustible",
-                "Uniquement la flamme",
-                "La couleur de la fumée"
-            ],
-            correctAnswer: 0,
-            explanation: "On peut supprimer le combustible, le comburant ou l'énergie pour éteindre un feu.",
-            timeLimit: 40,
-            points: 100
-        },
-        // Classes de Feu (5 questions)
-        {
+            type: "quiz",
             title: "Classes de Feu",
             icon: "📋",
             color: "from-blue-500 to-indigo-700",
@@ -425,38 +475,39 @@ const BOXES_DATA = {
             points: 100
         },
         {
-            title: "Classes de Feu",
+            type: "matching",
+            title: "Agents Extincteurs",
             icon: "📋",
             color: "from-blue-500 to-indigo-700",
-            question: "Un feu de classe C concerne :",
-            options: [
-                "Les gaz inflammables",
-                "Les solides",
-                "Les liquides",
-                "Les métaux"
+            question: "Associez chaque agent extincteur avec son utilisation principale :",
+            pairs: [
+                { left: "Eau pulvérisée", right: "Feux de classe A" },
+                { left: "Poudre ABC", right: "Feux A, B, C polyvalent" },
+                { left: "CO2", right: "Feux électriques et B" },
+                { left: "Mousse", right: "Feux de classe B" }
             ],
-            correctAnswer: 0,
-            explanation: "Les feux de classe C concernent les gaz inflammables comme le propane, le butane, le méthane.",
-            timeLimit: 35,
-            points: 100
+            explanation: "Chaque agent extincteur a des propriétés spécifiques adaptées à certains types de feux.",
+            timeLimit: 60,
+            points: 120
         },
         {
-            title: "Classes de Feu",
+            type: "sequence",
+            title: "Fonctionnement SSI",
             icon: "📋",
             color: "from-blue-500 to-indigo-700",
-            question: "Un feu de classe D concerne :",
-            options: [
-                "Les métaux comme le magnésium ou l'aluminium",
-                "Les solides ordinaires",
-                "Les liquides",
-                "Les gaz"
+            question: "Remettez dans l'ordre les étapes du fonctionnement d'un SSI :",
+            items: [
+                "Détection par un détecteur",
+                "Transmission au tableau de signalisation",
+                "Déclenchement de l'alarme",
+                "Mise en sécurité (désenfumage, etc.)"
             ],
-            correctAnswer: 0,
-            explanation: "Les feux de classe D concernent les métaux légers (magnésium, aluminium, sodium).",
-            timeLimit: 40,
-            points: 100
+            explanation: "Le SSI suit une séquence logique de détection à la mise en sécurité.",
+            timeLimit: 60,
+            points: 120
         },
         {
+            type: "quiz",
             title: "Classes de Feu",
             icon: "📋",
             color: "from-blue-500 to-indigo-700",
@@ -473,23 +524,20 @@ const BOXES_DATA = {
             points: 100
         },
         {
-            title: "Classes de Feu",
+            type: "true-false",
+            title: "Sécurité Incendie",
             icon: "📋",
             color: "from-blue-500 to-indigo-700",
-            question: "Peut-on utiliser de l'eau sur tous les types de feux ?",
-            options: [
-                "Non, jamais sur les feux de classe B, D ou électriques",
-                "Oui, l'eau convient à tous les feux",
-                "Uniquement sur les feux de classe C",
-                "Uniquement sur les métaux"
-            ],
-            correctAnswer: 0,
-            explanation: "L'eau ne doit JAMAIS être utilisée sur les feux de liquides, métaux ou installations électriques.",
-            timeLimit: 40,
+            question: "On peut utiliser de l'eau sur tous les types de feux ?",
+            options: ["Vrai", "Faux"],
+            correctAnswer: 1,
+            explanation: "Faux. L'eau ne doit JAMAIS être utilisée sur les feux de liquides, métaux ou installations électriques.",
+            timeLimit: 30,
             points: 100
         },
-        // Moyens d'Extinction (5 questions)
+        // Moyens d'Extinction et Intervention (5 questions variées)
         {
+            type: "quiz",
             title: "Moyens d'Extinction",
             icon: "🧯",
             color: "from-green-500 to-emerald-700",
@@ -506,22 +554,41 @@ const BOXES_DATA = {
             points: 100
         },
         {
-            title: "Moyens d'Extinction",
+            type: "sequence",
+            title: "Procédure d'Intervention",
             icon: "🧯",
             color: "from-green-500 to-emerald-700",
-            question: "L'extincteur à poudre ABC est efficace sur :",
-            options: [
-                "Feux de classe A, B et C",
-                "Uniquement feux de classe A",
-                "Uniquement feux de classe B",
-                "Feux de classe D uniquement"
+            question: "Ordre d'intervention du SSIAP en cas d'alarme incendie :",
+            items: [
+                "Levée de doute",
+                "Alerte des secours si feu confirmé",
+                "Mise en sécurité des personnes",
+                "Première intervention si possible"
             ],
-            correctAnswer: 0,
-            explanation: "La poudre ABC est polyvalente et efficace sur les feux de classe A, B et C.",
-            timeLimit: 40,
-            points: 100
+            explanation: "Cette procédure garantit une intervention méthodique et efficace.",
+            timeLimit: 60,
+            points: 120
         },
         {
+            type: "quiz-multi",
+            title: "Extincteurs",
+            icon: "🧯",
+            color: "from-green-500 to-emerald-700",
+            question: "Quelles affirmations sur les extincteurs sont vraies ? (Plusieurs réponses)",
+            options: [
+                "Distance maximale : 15m",
+                "Distance d'utilisation : 2-3m",
+                "Vérification annuelle obligatoire",
+                "Poudre ABC : feux A, B et C",
+                "Tous sont identiques"
+            ],
+            correctAnswers: [0, 1, 2, 3],
+            explanation: "Les extincteurs doivent être accessibles (15m max), utilisés à bonne distance (2-3m) et vérifiés annuellement.",
+            timeLimit: 70,
+            points: 150
+        },
+        {
+            type: "quiz",
             title: "Moyens d'Extinction",
             icon: "🧯",
             color: "from-green-500 to-emerald-700",
@@ -538,39 +605,20 @@ const BOXES_DATA = {
             points: 100
         },
         {
+            type: "true-false",
             title: "Moyens d'Extinction",
             icon: "🧯",
             color: "from-green-500 to-emerald-700",
-            question: "Quelle est la distance maximale à parcourir pour atteindre un extincteur ?",
-            options: [
-                "15 mètres maximum",
-                "30 mètres maximum",
-                "10 mètres maximum",
-                "20 mètres maximum"
-            ],
+            question: "Les extincteurs doivent être vérifiés annuellement ?",
+            options: ["Vrai", "Faux"],
             correctAnswer: 0,
-            explanation: "La réglementation impose 15 mètres maximum de distance pour accéder à un extincteur.",
-            timeLimit: 40,
+            explanation: "Vrai. Les extincteurs doivent être vérifiés annuellement par un organisme agréé.",
+            timeLimit: 30,
             points: 100
         },
+        // ERP et Alarme (5 questions variées)
         {
-            title: "Moyens d'Extinction",
-            icon: "🧯",
-            color: "from-green-500 to-emerald-700",
-            question: "À quelle fréquence les extincteurs doivent-ils être vérifiés ?",
-            options: [
-                "Annuellement",
-                "Tous les 6 mois",
-                "Tous les 2 ans",
-                "Tous les 3 ans"
-            ],
-            correctAnswer: 0,
-            explanation: "Les extincteurs doivent être vérifiés annuellement par un organisme agréé.",
-            timeLimit: 35,
-            points: 100
-        },
-        // Sécurité Incendie ERP (3 questions)
-        {
+            type: "quiz",
             title: "Sécurité Incendie",
             icon: "🏢",
             color: "from-orange-500 to-yellow-600",
@@ -587,22 +635,23 @@ const BOXES_DATA = {
             points: 100
         },
         {
-            title: "Sécurité Incendie",
+            type: "matching",
+            title: "Types d'ERP",
             icon: "🏢",
             color: "from-orange-500 to-yellow-600",
-            question: "Un restaurant est un ERP de type :",
-            options: [
-                "N (restaurants)",
-                "L (salles de spectacle)",
-                "M (magasins)",
-                "O (hôtels)"
+            question: "Associez chaque type d'ERP avec son activité :",
+            pairs: [
+                { left: "Type L", right: "Salles de spectacle" },
+                { left: "Type M", right: "Magasins" },
+                { left: "Type N", right: "Restaurants" },
+                { left: "Type O", right: "Hôtels" }
             ],
-            correctAnswer: 0,
-            explanation: "Les restaurants et débits de boissons sont des ERP de type N.",
-            timeLimit: 40,
-            points: 100
+            explanation: "Chaque type d'ERP correspond à une activité spécifique.",
+            timeLimit: 60,
+            points: 120
         },
         {
+            type: "quiz",
             title: "Sécurité Incendie",
             icon: "🏢",
             color: "from-orange-500 to-yellow-600",
@@ -618,8 +667,8 @@ const BOXES_DATA = {
             timeLimit: 40,
             points: 100
         },
-        // Alarme et Alerte (2 questions)
         {
+            type: "quiz",
             title: "Alarme et Alerte",
             icon: "🚨",
             color: "from-purple-500 to-pink-700",
@@ -636,25 +685,22 @@ const BOXES_DATA = {
             points: 100
         },
         {
+            type: "true-false",
             title: "Alarme et Alerte",
             icon: "🚨",
             color: "from-purple-500 to-pink-700",
-            question: "On doit toujours faire une levée de doute AVANT d'appeler les pompiers.",
-            options: [
-                "Vrai - pour limiter les dérangements inutiles",
-                "Faux - on appelle immédiatement",
-                "Vrai - sauf si inaccessible",
-                "Faux - c'est interdit"
-            ],
+            question: "On doit toujours faire une levée de doute AVANT d'appeler les pompiers ?",
+            options: ["Vrai", "Faux"],
             correctAnswer: 0,
-            explanation: "La levée de doute est obligatoire sauf impossibilité d'accès à la zone.",
-            timeLimit: 40,
+            explanation: "Vrai. La levée de doute est obligatoire sauf impossibilité d'accès à la zone.",
+            timeLimit: 30,
             points: 100
         }
     ],
-    2: [ // SSIAP 2 - 20 questions
-        // Chef d'Équipe (6 questions)
+    2: [ // SSIAP 2 - 20 questions variées
+        // Chef d'Équipe (5 questions variées)
         {
+            type: "quiz",
             title: "Chef d'Équipe",
             icon: "👨‍✈️",
             color: "from-red-500 to-orange-700",
@@ -671,38 +717,22 @@ const BOXES_DATA = {
             points: 100
         },
         {
-            title: "Chef d'Équipe",
+            type: "matching",
+            title: "Hiérarchie SSIAP",
             icon: "👨‍✈️",
             color: "from-red-500 to-orange-700",
-            question: "Le chef d'équipe SSIAP 2 est placé sous l'autorité :",
-            options: [
-                "Du chef de service de sécurité incendie (SSIAP 3)",
-                "Du maire",
-                "Des sapeurs-pompiers",
-                "Du chef d'établissement directement"
+            question: "Associez chaque niveau SSIAP avec son rôle principal :",
+            pairs: [
+                { left: "SSIAP 1", right: "Agent de sécurité incendie" },
+                { left: "SSIAP 2", right: "Chef d'équipe" },
+                { left: "SSIAP 3", right: "Chef de service" }
             ],
-            correctAnswer: 0,
-            explanation: "Le SSIAP 2 est hiérarchiquement placé sous l'autorité du SSIAP 3.",
-            timeLimit: 40,
-            points: 100
+            explanation: "Chaque niveau SSIAP a un rôle hiérarchique et des missions spécifiques.",
+            timeLimit: 60,
+            points: 120
         },
         {
-            title: "Chef d'Équipe",
-            icon: "👨‍✈️",
-            color: "from-red-500 to-orange-700",
-            question: "Le chef d'équipe doit assurer la formation continue :",
-            options: [
-                "Des agents de sécurité incendie (SSIAP 1)",
-                "Des sapeurs-pompiers",
-                "Du public",
-                "De la direction uniquement"
-            ],
-            correctAnswer: 0,
-            explanation: "Le SSIAP 2 assure la formation continue et le recyclage des SSIAP 1 de son équipe.",
-            timeLimit: 40,
-            points: 100
-        },
-        {
+            type: "quiz",
             title: "Chef d'Équipe",
             icon: "👨‍✈️",
             color: "from-red-500 to-orange-700",
@@ -719,39 +749,38 @@ const BOXES_DATA = {
             points: 100
         },
         {
+            type: "true-false",
             title: "Chef d'Équipe",
             icon: "👨‍✈️",
             color: "from-red-500 to-orange-700",
-            question: "En l'absence du SSIAP 3, qui assure la continuité du service ?",
-            options: [
-                "Le chef d'équipe SSIAP 2",
-                "Le SSIAP 1 le plus ancien",
-                "Le chef d'établissement",
-                "Les sapeurs-pompiers"
-            ],
+            question: "En l'absence du SSIAP 3, le chef d'équipe SSIAP 2 assure la continuité du service ?",
+            options: ["Vrai", "Faux"],
             correctAnswer: 0,
-            explanation: "Le SSIAP 2 assure la continuité du service en l'absence du SSIAP 3.",
-            timeLimit: 40,
+            explanation: "Vrai. Le SSIAP 2 assure la continuité du service en l'absence du SSIAP 3.",
+            timeLimit: 30,
             points: 100
         },
         {
-            title: "Chef d'Équipe",
+            type: "quiz-multi",
+            title: "Missions SSIAP 2",
             icon: "👨‍✈️",
             color: "from-red-500 to-orange-700",
-            question: "Qui établit les plannings des rondes et des équipes ?",
+            question: "Quelles sont les missions du chef d'équipe SSIAP 2 ? (Plusieurs réponses)",
             options: [
-                "Le chef d'équipe SSIAP 2",
-                "Chaque agent SSIAP 1",
-                "Le chef d'établissement",
-                "La commission de sécurité"
+                "Former les SSIAP 1",
+                "Établir les plannings",
+                "Gérer le PC sécurité",
+                "Organiser les rondes",
+                "Remplacer le maire"
             ],
-            correctAnswer: 0,
-            explanation: "Le SSIAP 2 organise et planifie les rondes et le travail des équipes.",
-            timeLimit: 40,
-            points: 100
+            correctAnswers: [0, 1, 2, 3],
+            explanation: "Le SSIAP 2 forme, planifie, gère le PC et organise les rondes de son équipe.",
+            timeLimit: 70,
+            points: 150
         },
-        // PC Sécurité (4 questions)
+        // PC Sécurité et Rondes (5 questions variées)
         {
+            type: "quiz",
             title: "Gestion PC Sécurité",
             icon: "💻",
             color: "from-cyan-500 to-blue-700",
@@ -768,42 +797,57 @@ const BOXES_DATA = {
             points: 100
         },
         {
-            title: "Gestion PC Sécurité",
+            type: "quiz-multi",
+            title: "Rondes de Sécurité",
             icon: "💻",
             color: "from-cyan-500 to-blue-700",
-            question: "Lors d'une ronde, le chef d'équipe doit vérifier :",
+            question: "Lors d'une ronde, que doit vérifier le chef d'équipe ? (Plusieurs réponses)",
             options: [
-                "Les issues de secours et moyens de secours",
-                "Uniquement les extincteurs",
-                "Uniquement le SSI",
-                "Rien, c'est le rôle des agents"
+                "Issues de secours libres",
+                "Moyens de secours en place",
+                "Fonctionnement du SSI",
+                "Respect des consignes de sécurité",
+                "Uniquement les extincteurs"
             ],
-            correctAnswer: 0,
+            correctAnswers: [0, 1, 2, 3],
             explanation: "Le chef d'équipe vérifie issues, moyens de secours, SSI et respect des consignes.",
-            timeLimit: 40,
-            points: 100
+            timeLimit: 70,
+            points: 150
         },
         {
-            title: "Gestion PC Sécurité",
+            type: "sequence",
+            title: "Vérification Extincteur",
             icon: "💻",
             color: "from-cyan-500 to-blue-700",
-            question: "Le chef d'équipe est responsable du bon fonctionnement du poste central de sécurité.",
-            options: [
-                "Vrai",
-                "Faux",
-                "Uniquement en l'absence du SSIAP 3",
-                "Uniquement de jour"
+            question: "Étapes de vérification annuelle d'un extincteur :",
+            items: [
+                "Contrôle visuel de l'état général",
+                "Vérification de la pression/masse",
+                "Contrôle de l'accessibilité",
+                "Apposition de l'étiquette de contrôle"
             ],
-            correctAnswer: 0,
-            explanation: "Le chef d'équipe est responsable du PC sécurité et de son bon fonctionnement.",
-            timeLimit: 35,
-            points: 100
+            explanation: "Ces étapes doivent être suivies pour une vérification complète.",
+            timeLimit: 60,
+            points: 120
         },
         {
+            type: "true-false",
             title: "Gestion PC Sécurité",
             icon: "💻",
             color: "from-cyan-500 to-blue-700",
-            question: "Le chef d'équipe s'assure du bon état et de la disponibilité des équipements de sécurité.",
+            question: "Le chef d'équipe est responsable du bon fonctionnement du poste central de sécurité ?",
+            options: ["Vrai", "Faux"],
+            correctAnswer: 0,
+            explanation: "Vrai. Le chef d'équipe est responsable du PC sécurité et de son bon fonctionnement.",
+            timeLimit: 30,
+            points: 100
+        },
+        {
+            type: "quiz",
+            title: "Gestion PC Sécurité",
+            icon: "💻",
+            color: "from-cyan-500 to-blue-700",
+            question: "Le chef d'équipe s'assure du bon état des équipements de sécurité:",
             options: [
                 "Vrai - c'est une de ses missions",
                 "Faux - c'est le rôle du SSIAP 1",
@@ -815,8 +859,9 @@ const BOXES_DATA = {
             timeLimit: 40,
             points: 100
         },
-        // Hygiène et Sécurité (3 questions)
+        // Hygiène, Sécurité et Formation (5 questions variées)
         {
+            type: "quiz",
             title: "Hygiène et Sécurité",
             icon: "⚠️",
             color: "from-red-500 to-rose-700",
@@ -833,6 +878,7 @@ const BOXES_DATA = {
             points: 100
         },
         {
+            type: "quiz",
             title: "Hygiène et Sécurité",
             icon: "⚠️",
             color: "from-red-500 to-rose-700",
@@ -849,72 +895,54 @@ const BOXES_DATA = {
             points: 100
         },
         {
-            title: "Hygiène et Sécurité",
+            type: "quiz-multi",
+            title: "Responsabilités SSIAP 2",
             icon: "⚠️",
             color: "from-red-500 to-rose-700",
-            question: "Le chef d'équipe contrôle la tenue et le comportement des agents de sécurité.",
+            question: "Le chef d'équipe est responsable de : (Plusieurs réponses)",
             options: [
-                "Vrai - c'est une de ses responsabilités",
-                "Faux - c'est le rôle du SSIAP 3",
-                "Faux - c'est le rôle des RH",
-                "Uniquement pendant les exercices"
+                "Contrôler la tenue des agents",
+                "Former les SSIAP 1",
+                "Organiser les exercices d'évacuation",
+                "Prendre des décisions en crise",
+                "Rédiger les lois"
             ],
-            correctAnswer: 0,
-            explanation: "Le contrôle de l'équipe (tenue, comportement, respect des consignes) fait partie de ses responsabilités.",
-            timeLimit: 35,
-            points: 100
+            correctAnswers: [0, 1, 2, 3],
+            explanation: "Le chef d'équipe contrôle son équipe, forme, organise les exercices et décide en situation d'urgence.",
+            timeLimit: 70,
+            points: 150
         },
-        // Exercices et Formation (3 questions)
         {
+            type: "true-false",
             title: "Exercices et Formation",
             icon: "📚",
             color: "from-indigo-500 to-purple-700",
-            question: "Le chef d'équipe peut former les agents SSIAP 1 de son équipe.",
-            options: [
-                "Vrai - formation continue",
-                "Faux - seul le SSIAP 3 peut former",
-                "Faux - seul un formateur externe",
-                "Uniquement les exercices"
-            ],
+            question: "Le chef d'équipe peut former les agents SSIAP 1 de son équipe ?",
+            options: ["Vrai", "Faux"],
             correctAnswer: 0,
-            explanation: "Le SSIAP 2 assure la formation continue et le recyclage des SSIAP 1.",
-            timeLimit: 35,
+            explanation: "Vrai. Le SSIAP 2 assure la formation continue et le recyclage des SSIAP 1.",
+            timeLimit: 30,
             points: 100
         },
         {
-            title: "Exercices et Formation",
+            type: "sequence",
+            title: "Déclenchement Manuel",
             icon: "📚",
             color: "from-indigo-500 to-purple-700",
-            question: "Le chef d'équipe organise et supervise les exercices d'évacuation.",
-            options: [
-                "Vrai",
-                "Faux - c'est le rôle du SSIAP 3",
-                "Faux - c'est le rôle du chef d'établissement",
-                "Uniquement s'il y a plus de 50 personnes"
+            question: "Étapes après l'activation d'un déclencheur manuel :",
+            items: [
+                "Signal transmis au tableau de signalisation",
+                "Identification de la zone concernée",
+                "Levée de doute par le SSIAP",
+                "Déclenchement alarme évacuation si nécessaire"
             ],
-            correctAnswer: 0,
-            explanation: "L'organisation et la supervision des exercices font partie de ses missions.",
-            timeLimit: 35,
-            points: 100
+            explanation: "Cette procédure garantit une réponse adaptée à chaque situation.",
+            timeLimit: 60,
+            points: 120
         },
+        // Manipulation SSI (5 questions variées)
         {
-            title: "Exercices et Formation",
-            icon: "📚",
-            color: "from-indigo-500 to-purple-700",
-            question: "Le chef d'équipe peut prendre des décisions en autonomie lors d'une crise.",
-            options: [
-                "Vrai - c'est nécessaire",
-                "Faux - il doit toujours attendre le SSIAP 3",
-                "Faux - seul le chef d'établissement décide",
-                "Uniquement pour évacuer"
-            ],
-            correctAnswer: 0,
-            explanation: "En situation de crise, il doit pouvoir prendre des décisions rapides pour assurer la sécurité.",
-            timeLimit: 40,
-            points: 100
-        },
-        // Manipulation SSI (4 questions)
-        {
+            type: "quiz",
             title: "Manipulation SSI",
             icon: "🖥️",
             color: "from-orange-500 to-yellow-600",
@@ -931,38 +959,41 @@ const BOXES_DATA = {
             points: 100
         },
         {
-            title: "Manipulation SSI",
+            type: "matching",
+            title: "Systèmes SSI",
             icon: "🖥️",
             color: "from-orange-500 to-yellow-600",
-            question: "Que signifie DAS ?",
-            options: [
-                "Dispositif Actionné de Sécurité",
-                "Détecteur Automatique de Sécurité",
-                "Déclencheur d'Alarme Spéciale",
-                "Dispositif d'Alerte Sonore"
+            question: "Associez chaque sigle avec sa signification :",
+            pairs: [
+                { left: "CMSI", right: "Centralisateur Mise en Sécurité" },
+                { left: "DAS", right: "Dispositif Actionné de Sécurité" },
+                { left: "BAES", right: "Bloc Autonome Éclairage Sécurité" },
+                { left: "SSI", right: "Système de Sécurité Incendie" }
             ],
-            correctAnswer: 0,
-            explanation: "Le DAS libère automatiquement les portes en cas d'alarme incendie.",
-            timeLimit: 40,
-            points: 100
+            explanation: "Ces sigles sont essentiels pour comprendre le système de sécurité incendie.",
+            timeLimit: 60,
+            points: 120
         },
         {
-            title: "Manipulation SSI",
+            type: "quiz-multi",
+            title: "Fonctions CMSI",
             icon: "🖥️",
             color: "from-orange-500 to-yellow-600",
-            question: "Quelle fonction n'est PAS assurée par un CMSI ?",
+            question: "Quelles fonctions sont assurées par un CMSI ? (Plusieurs réponses)",
             options: [
-                "Extinction automatique",
                 "Mise en sécurité des ascenseurs",
                 "Déclenchement de l'alarme",
-                "Commande du désenfumage"
+                "Commande du désenfumage",
+                "Extinction automatique",
+                "Gestion des accès"
             ],
-            correctAnswer: 0,
-            explanation: "Le CMSI ne commande pas l'extinction automatique (sprinklers ont leur propre système).",
-            timeLimit: 45,
-            points: 100
+            correctAnswers: [0, 1, 2],
+            explanation: "Le CMSI gère les ascenseurs, l'alarme et le désenfumage, mais pas l'extinction automatique.",
+            timeLimit: 70,
+            points: 150
         },
         {
+            type: "quiz",
             title: "Manipulation SSI",
             icon: "🖥️",
             color: "from-orange-500 to-yellow-600",
@@ -977,11 +1008,30 @@ const BOXES_DATA = {
             explanation: "Une zone de détection ne doit pas dépasser 1600 m².",
             timeLimit: 40,
             points: 100
+        },
+        {
+            type: "quiz-multi",
+            title: "Colonnes Sèches et Humides",
+            icon: "🖥️",
+            color: "from-orange-500 to-yellow-600",
+            question: "Quelles affirmations sur les colonnes sont vraies ? (Plusieurs réponses)",
+            options: [
+                "Colonne sèche : vide en temps normal",
+                "Colonne humide : toujours en eau",
+                "Colonne sèche : bâtiments 18m à 50m",
+                "Colonne humide : bâtiments > 50m",
+                "Alimentation par les pompiers"
+            ],
+            correctAnswers: [0, 1, 2, 3],
+            explanation: "Les colonnes sèches et humides ont des caractéristiques spécifiques selon la hauteur du bâtiment.",
+            timeLimit: 70,
+            points: 160
         }
     ],
-    3: [ // SSIAP 3 - 20 questions
-        // Gestion du Service (6 questions quiz)
+    3: [ // SSIAP 3 - 20 questions variées
+        // Gestion du Service (5 questions variées)
         {
+            type: "quiz",
             title: "Chef de Service",
             icon: "👔",
             color: "from-red-500 to-orange-700",
@@ -998,6 +1048,7 @@ const BOXES_DATA = {
             points: 100
         },
         {
+            type: "quiz",
             title: "Effectif",
             icon: "👔",
             color: "from-red-500 to-orange-700",
@@ -1014,71 +1065,53 @@ const BOXES_DATA = {
             points: 100
         },
         {
-            title: "Autorité",
+            type: "quiz-multi",
+            title: "Missions SSIAP 3",
             icon: "👔",
             color: "from-red-500 to-orange-700",
-            question: "Le chef de service est placé sous l'autorité :",
+            question: "Quelles sont les missions du chef de service SSIAP 3 ? (Plusieurs réponses)",
             options: [
-                "Du chef d'établissement",
-                "Du maire",
-                "Des sapeurs-pompiers",
-                "De la préfecture"
+                "Conseil au chef d'établissement",
+                "Management du service",
+                "Gestion budgétaire",
+                "Relations avec les autorités",
+                "Conduire les bus"
             ],
-            correctAnswer: 0,
-            explanation: "Le SSIAP 3 est hiérarchiquement placé sous l'autorité du chef d'établissement.",
-            timeLimit: 40,
-            points: 100
+            correctAnswers: [0, 1, 2, 3],
+            explanation: "Le SSIAP 3 a des missions variées : conseil, management, gestion budgétaire, relations avec les autorités.",
+            timeLimit: 70,
+            points: 150
         },
         {
+            type: "true-false",
             title: "Délégation",
             icon: "👔",
             color: "from-red-500 to-orange-700",
-            question: "Le chef d'établissement peut déléguer au SSIAP 3 :",
-            options: [
-                "Certaines responsabilités de sécurité par écrit",
-                "Toute sa responsabilité",
-                "Aucune responsabilité",
-                "Uniquement les responsabilités financières"
-            ],
+            question: "Le chef d'établissement peut déléguer certaines responsabilités de sécurité au SSIAP 3 par écrit ?",
+            options: ["Vrai", "Faux"],
             correctAnswer: 0,
-            explanation: "La délégation doit être écrite, précise et limitée aux responsabilités de sécurité.",
-            timeLimit: 45,
+            explanation: "Vrai. La délégation doit être écrite, précise et limitée aux responsabilités de sécurité.",
+            timeLimit: 30,
             points: 100
         },
         {
-            title: "Missions",
+            type: "matching",
+            title: "Niveaux SSIAP",
             icon: "👔",
             color: "from-red-500 to-orange-700",
-            question: "Parmi les missions du SSIAP 3, on trouve :",
-            options: [
-                "Conseil au chef d'établissement, management, gestion budgétaire",
-                "Uniquement l'intervention sur feu",
-                "Uniquement la formation",
-                "Uniquement les rondes"
+            question: "Associez chaque niveau avec ses responsabilités principales :",
+            pairs: [
+                { left: "SSIAP 1", right: "Intervention et rondes" },
+                { left: "SSIAP 2", right: "Management d'équipe" },
+                { left: "SSIAP 3", right: "Direction du service" }
             ],
-            correctAnswer: 0,
-            explanation: "Le SSIAP 3 a des missions variées : conseil, management, gestion budgétaire, relations avec les autorités.",
-            timeLimit: 50,
-            points: 100
+            explanation: "Chaque niveau a un périmètre de responsabilité croissant.",
+            timeLimit: 60,
+            points: 120
         },
+        // Réglementation et Sécurité (5 questions variées)
         {
-            title: "Responsabilité Pénale",
-            icon: "👔",
-            color: "from-red-500 to-orange-700",
-            question: "En cas d'accident grave, le SSIAP 3 peut engager :",
-            options: [
-                "Sa responsabilité pénale si faute démontrée",
-                "Uniquement la responsabilité de l'établissement",
-                "Aucune responsabilité",
-                "Uniquement une responsabilité civile"
-            ],
-            correctAnswer: 0,
-            explanation: "Le SSIAP 3 peut voir sa responsabilité pénale engagée en cas de faute démontrée.",
-            timeLimit: 45,
-            points: 100
-        },
-        // Réglementation (5 questions quiz)
-        {
+            type: "quiz",
             title: "Code Construction",
             icon: "📜",
             color: "from-orange-500 to-yellow-600",
@@ -1095,22 +1128,23 @@ const BOXES_DATA = {
             points: 100
         },
         {
-            title: "Arrêté ERP",
+            type: "matching",
+            title: "Sigles Réglementaires",
             icon: "📜",
             color: "from-orange-500 to-yellow-600",
-            question: "L'arrêté du 25 juin 1980 concerne :",
-            options: [
-                "La sécurité incendie dans les ERP",
-                "Les IGH uniquement",
-                "Les habitations",
-                "Le Code du Travail"
+            question: "Associez chaque sigle avec sa signification :",
+            pairs: [
+                { left: "ERP", right: "Établissement Recevant du Public" },
+                { left: "IGH", right: "Immeuble de Grande Hauteur" },
+                { left: "ICPE", right: "Installation Classée Protection Environnement" },
+                { left: "DUER", right: "Document Unique Évaluation Risques" }
             ],
-            correctAnswer: 0,
-            explanation: "L'arrêté du 25 juin 1980 (modifié) fixe les dispositions de sécurité incendie dans les ERP.",
-            timeLimit: 40,
-            points: 100
+            explanation: "Ces sigles réglementaires sont fondamentaux pour le SSIAP 3.",
+            timeLimit: 60,
+            points: 120
         },
         {
+            type: "quiz",
             title: "IGH",
             icon: "📜",
             color: "from-orange-500 to-yellow-600",
@@ -1127,22 +1161,23 @@ const BOXES_DATA = {
             points: 100
         },
         {
-            title: "ICPE",
+            type: "sequence",
+            title: "Hiérarchie Commissions",
             icon: "📜",
             color: "from-orange-500 to-yellow-600",
-            question: "Que signifie ICPE ?",
-            options: [
-                "Installation Classée pour la Protection de l'Environnement",
-                "Incendie Classé Pour Évacuation",
-                "Installation de Contrôle des Produits Explosifs",
-                "Intervention Collective Pour l'Environnement"
+            question: "Ordre hiérarchique des commissions de sécurité (du local au national) :",
+            items: [
+                "Commission communale",
+                "Commission d'arrondissement",
+                "Commission départementale",
+                "Commission nationale"
             ],
-            correctAnswer: 0,
-            explanation: "ICPE = Installation Classée pour la Protection de l'Environnement (industries, activités dangereuses).",
-            timeLimit: 45,
-            points: 100
+            explanation: "Les commissions de sécurité suivent une organisation territoriale.",
+            timeLimit: 60,
+            points: 120
         },
         {
+            type: "quiz",
             title: "Pouvoir Police",
             icon: "📜",
             color: "from-orange-500 to-yellow-600",
@@ -1158,132 +1193,154 @@ const BOXES_DATA = {
             timeLimit: 45,
             points: 100
         },
-        // True-False (9 questions)
+        // Responsabilités et Missions (10 questions variées)
         {
+            type: "true-false",
             title: "Responsabilité Finale",
             icon: "⚖️",
             color: "from-purple-500 to-pink-700",
-            question: "Le chef d'établissement reste toujours le seul responsable de la sécurité.",
-            options: [
-                "Vrai",
-                "Faux"
-            ],
+            question: "Le chef d'établissement reste toujours le seul responsable de la sécurité ?",
+            options: ["Vrai", "Faux"],
             correctAnswer: 0,
             explanation: "VRAI - Même avec délégation, le chef d'établissement garde la responsabilité finale.",
-            timeLimit: 35,
-            points: 80
+            timeLimit: 30,
+            points: 100
         },
         {
-            title: "Budget",
+            type: "quiz-multi",
+            title: "Missions Budgétaires",
             icon: "💰",
             color: "from-green-500 to-emerald-700",
-            question: "Le SSIAP 3 propose et gère le budget du service de sécurité.",
+            question: "Quelles tâches budgétaires relèvent du SSIAP 3 ? (Plusieurs réponses)",
             options: [
-                "Vrai",
-                "Faux"
+                "Proposer le budget du service",
+                "Gérer les dépenses courantes",
+                "Suivre les investissements matériels",
+                "Valider les budgets nationaux",
+                "Acheter des terrains"
             ],
-            correctAnswer: 0,
-            explanation: "VRAI - Il établit le budget et suit les dépenses du service de sécurité.",
-            timeLimit: 30,
-            points: 80
+            correctAnswers: [0, 1, 2],
+            explanation: "Le SSIAP 3 propose, gère et suit le budget du service de sécurité.",
+            timeLimit: 70,
+            points: 150
         },
         {
+            type: "true-false",
             title: "Formation",
             icon: "📚",
             color: "from-blue-500 to-indigo-700",
-            question: "Le SSIAP 3 peut former les SSIAP 1 et SSIAP 2.",
-            options: [
-                "Vrai",
-                "Faux"
-            ],
+            question: "Le SSIAP 3 peut former les SSIAP 1 et SSIAP 2 ?",
+            options: ["Vrai", "Faux"],
             correctAnswer: 0,
             explanation: "VRAI - Il assure la formation continue de son équipe (SSIAP 1 et 2).",
             timeLimit: 30,
-            points: 80
+            points: 100
         },
         {
-            title: "Recrutement",
+            type: "quiz-multi",
+            title: "Responsabilités RH",
             icon: "👥",
             color: "from-cyan-500 to-blue-700",
-            question: "Le chef de service participe au recrutement des agents de sécurité.",
+            question: "Le SSIAP 3 intervient dans : (Plusieurs réponses)",
             options: [
-                "Vrai",
-                "Faux"
+                "Recrutement des agents",
+                "Formation continue",
+                "Évaluation des agents",
+                "Définition des profils de poste",
+                "Gestion de la paie"
             ],
-            correctAnswer: 0,
-            explanation: "VRAI - Il définit les profils et participe aux entretiens de recrutement.",
-            timeLimit: 30,
-            points: 80
+            correctAnswers: [0, 1, 2, 3],
+            explanation: "Le SSIAP 3 gère les aspects RH du service sauf la paie qui relève de l'administration.",
+            timeLimit: 70,
+            points: 150
         },
         {
-            title: "Autonomie",
-            icon: "🎯",
-            color: "from-indigo-500 to-purple-700",
-            question: "Le SSIAP 3 a une large autonomie dans la gestion de son service.",
-            options: [
-                "Vrai",
-                "Faux"
-            ],
-            correctAnswer: 0,
-            explanation: "VRAI - Il gère son service en autonomie dans le cadre de sa délégation.",
-            timeLimit: 30,
-            points: 80
-        },
-        {
+            type: "true-false",
             title: "Décision Fermeture",
             icon: "🚫",
             color: "from-red-500 to-rose-700",
-            question: "Le SSIAP 3 peut décider seul de fermer l'établissement.",
-            options: [
-                "Vrai",
-                "Faux"
-            ],
+            question: "Le SSIAP 3 peut décider seul de fermer l'établissement ?",
+            options: ["Vrai", "Faux"],
             correctAnswer: 1,
             explanation: "FAUX - Seul le maire (ou préfet) peut ordonner la fermeture. Le SSIAP 3 peut conseiller.",
-            timeLimit: 35,
-            points: 80
+            timeLimit: 30,
+            points: 100
         },
         {
+            type: "true-false",
             title: "Commission Sécurité",
             icon: "🏛️",
             color: "from-orange-500 to-red-600",
-            question: "Le SSIAP 3 assiste le chef d'établissement lors des visites de la commission de sécurité.",
-            options: [
-                "Vrai",
-                "Faux"
-            ],
+            question: "Le SSIAP 3 assiste le chef d'établissement lors des visites de la commission de sécurité ?",
+            options: ["Vrai", "Faux"],
             correctAnswer: 0,
             explanation: "VRAI - Il accompagne et assiste le chef d'établissement lors des visites de commission.",
-            timeLimit: 35,
-            points: 80
+            timeLimit: 30,
+            points: 100
         },
         {
+            type: "sequence",
+            title: "Procédure Commission",
+            icon: "🏛️",
+            color: "from-orange-500 to-red-600",
+            question: "Étapes d'une visite de commission de sécurité :",
+            items: [
+                "Préparation des documents",
+                "Visite de l'établissement",
+                "Rédaction du procès-verbal",
+                "Notification des prescriptions"
+            ],
+            explanation: "Cette procédure garantit un contrôle méthodique de la sécurité.",
+            timeLimit: 60,
+            points: 120
+        },
+        {
+            type: "true-false",
             title: "Registre Sécurité",
             icon: "📖",
             color: "from-yellow-500 to-orange-600",
-            question: "Le registre de sécurité doit être tenu à jour par le SSIAP 3.",
-            options: [
-                "Vrai",
-                "Faux"
-            ],
+            question: "Le registre de sécurité doit être tenu à jour par le SSIAP 3 ?",
+            options: ["Vrai", "Faux"],
             correctAnswer: 0,
             explanation: "VRAI - Le SSIAP 3 veille à la tenue à jour du registre de sécurité.",
             timeLimit: 30,
-            points: 80
+            points: 100
         },
         {
-            title: "Plans Intervention",
-            icon: "🗺️",
-            color: "from-teal-500 to-cyan-700",
-            question: "Le SSIAP 3 élabore les plans d'intervention et consignes de sécurité.",
+            type: "quiz-multi",
+            title: "Documents du Service",
+            icon: "📖",
+            color: "from-yellow-500 to-orange-600",
+            question: "Quels documents le SSIAP 3 doit-il gérer ? (Plusieurs réponses)",
             options: [
-                "Vrai",
-                "Faux"
+                "Registre de sécurité",
+                "Plans d'intervention",
+                "Consignes de sécurité",
+                "Rapports d'intervention",
+                "Factures électriques"
             ],
-            correctAnswer: 0,
-            explanation: "VRAI - Il élabore et met à jour les plans d'intervention et les consignes de sécurité.",
-            timeLimit: 30,
-            points: 80
+            correctAnswers: [0, 1, 2, 3],
+            explanation: "Le SSIAP 3 gère tous les documents relatifs à la sécurité incendie.",
+            timeLimit: 70,
+            points: 150
+        },
+        {
+            type: "quiz-multi",
+            title: "Relations Externes",
+            icon: "🤝",
+            color: "from-teal-500 to-cyan-700",
+            question: "Avec qui le SSIAP 3 est-il en relation ? (Plusieurs réponses)",
+            options: [
+                "Commission de sécurité",
+                "SDIS (pompiers)",
+                "Mairie/Préfecture",
+                "Bureaux de contrôle",
+                "Services de livraison"
+            ],
+            correctAnswers: [0, 1, 2, 3],
+            explanation: "Le SSIAP 3 est l'interface entre l'établissement et toutes les autorités de sécurité.",
+            timeLimit: 70,
+            points: 150
         }
     ]
 };
@@ -1646,15 +1703,78 @@ function showTraineeAnswerScreen() {
 
         document.getElementById('trainee-question-num').textContent = currentGameIndex + 1;
 
-        // Afficher les options de réponse (sans la question)
         const container = document.getElementById('trainee-options');
-        container.innerHTML = game.options.map((option, index) => `
-            <button onclick="selectAnswer(${index})" class="option-btn px-6 py-4 rounded-xl font-bold text-lg transition hover:scale-105 bg-white/20 border-2 border-white/30" data-index="${index}">
-                ${String.fromCharCode(65 + index)}. ${option}
-            </button>
-        `).join('');
+        const gameType = game.type || 'quiz';
 
+        // Réinitialiser les variables
         selectedAnswer = null;
+        selectedAnswers = [];
+        matchingPairs = [];
+        sequenceOrder = [];
+        selectedLeft = null;
+        selectedRight = null;
+
+        // Afficher selon le type de jeu
+        if (gameType === 'matching') {
+            // Interface matching pour stagiaires
+            const shuffledLeft = [...game.pairs].sort(() => Math.random() - 0.5);
+            const shuffledRight = [...game.pairs].map(p => p.right).sort(() => Math.random() - 0.5);
+
+            container.innerHTML = `
+                <div class="matching-container">
+                    <div class="space-y-2" id="matching-left">
+                        ${shuffledLeft.map((pair, index) => `
+                            <button onclick="selectMatchingLeft(${index}, '${pair.left.replace(/'/g, "\\'")}', '${pair.right.replace(/'/g, "\\'")}')"
+                                class="matching-item w-full bg-white/20 p-3 rounded-xl border-2 border-white/30 text-left" data-left="${index}">
+                                ${index + 1}. ${pair.left}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div class="space-y-2" id="matching-right">
+                        ${shuffledRight.map((right, index) => `
+                            <button onclick="selectMatchingRight(${index}, '${right.replace(/'/g, "\\'")}')"
+                                class="matching-item w-full bg-white/20 p-3 rounded-xl border-2 border-white/30 text-left" data-right="${index}">
+                                ${String.fromCharCode(65 + index)}. ${right}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        } else if (gameType === 'sequence') {
+            // Interface sequence pour stagiaires
+            const shuffledItems = [...game.items].map((item, index) => ({item, originalIndex: index})).sort(() => Math.random() - 0.5);
+            sequenceOrder = shuffledItems.map(s => s.originalIndex);
+
+            container.innerHTML = `
+                <div class="space-y-2" id="sequence-container">
+                    ${shuffledItems.map((s, index) => `
+                        <div class="sequence-item bg-white/20 p-4 rounded-xl border-2 border-white/30 cursor-move flex justify-between items-center" data-index="${index}">
+                            <span>${s.item}</span>
+                            <div class="flex gap-2">
+                                <button onclick="moveSequenceUp(${index})" class="bg-blue-500 px-3 py-1 rounded" ${index === 0 ? 'disabled' : ''}>↑</button>
+                                <button onclick="moveSequenceDown(${index})" class="bg-blue-500 px-3 py-1 rounded" ${index === shuffledItems.length - 1 ? 'disabled' : ''}>↓</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } else if (gameType === 'quiz-multi') {
+            // Interface quiz-multi pour stagiaires
+            container.innerHTML = game.options.map((option, index) => `
+                <label class="checkbox-option flex items-center bg-white/20 p-4 rounded-xl border-2 border-white/30 cursor-pointer hover:bg-white/30 transition">
+                    <input type="checkbox" onchange="toggleMultiAnswer(${index})" class="mr-3" data-index="${index}">
+                    <span class="text-lg">${String.fromCharCode(65 + index)}. ${option}</span>
+                </label>
+            `).join('');
+        } else {
+            // Interface standard pour quiz et true-false
+            container.innerHTML = game.options.map((option, index) => `
+                <button onclick="selectAnswer(${index})" class="option-btn px-6 py-4 rounded-xl font-bold text-lg transition hover:scale-105 bg-white/20 border-2 border-white/30" data-index="${index}">
+                    ${String.fromCharCode(65 + index)}. ${option}
+                </button>
+            `).join('');
+        }
+
         document.getElementById('trainee-submit-btn').disabled = true;
 
         // Charger le score
@@ -1681,19 +1801,161 @@ function selectAnswer(index) {
     document.getElementById('trainee-submit-btn').disabled = false;
 }
 
+// Fonctions pour quiz-multi
+function toggleMultiAnswer(index) {
+    if (selectedAnswers.includes(index)) {
+        selectedAnswers = selectedAnswers.filter(i => i !== index);
+    } else {
+        selectedAnswers.push(index);
+    }
+    document.getElementById('trainee-submit-btn').disabled = selectedAnswers.length === 0;
+}
+
+// Fonctions pour matching
+function selectMatchingLeft(index, left, right) {
+    selectedLeft = {index, left, right};
+
+    // Highlight
+    document.querySelectorAll('[data-left]').forEach((btn, i) => {
+        if (i === index) {
+            btn.classList.add('selected', 'bg-blue-500');
+            btn.classList.remove('bg-white/20');
+        } else {
+            btn.classList.remove('selected', 'bg-blue-500');
+            btn.classList.add('bg-white/20');
+        }
+    });
+
+    if (selectedRight !== null) {
+        createMatchingPair();
+    }
+}
+
+function selectMatchingRight(index, right) {
+    selectedRight = {index, right};
+
+    // Highlight
+    document.querySelectorAll('[data-right]').forEach((btn, i) => {
+        if (i === index) {
+            btn.classList.add('selected', 'bg-blue-500');
+            btn.classList.remove('bg-white/20');
+        } else {
+            btn.classList.remove('selected', 'bg-blue-500');
+            btn.classList.add('bg-white/20');
+        }
+    });
+
+    if (selectedLeft !== null) {
+        createMatchingPair();
+    }
+}
+
+function createMatchingPair() {
+    if (!selectedLeft || !selectedRight) return;
+
+    matchingPairs.push({
+        left: selectedLeft.left,
+        right: selectedRight.right,
+        correctRight: selectedLeft.right
+    });
+
+    // Marquer comme matched
+    document.querySelector(`[data-left="${selectedLeft.index}"]`).classList.add('matched');
+    document.querySelector(`[data-right="${selectedRight.index}"]`).classList.add('matched');
+
+    selectedLeft = null;
+    selectedRight = null;
+
+    // Vérifier si toutes les paires sont créées
+    database.ref('sessions/' + sessionId + '/currentGame').once('value', (snapshot) => {
+        const game = snapshot.val();
+        if (matchingPairs.length === game.pairs.length) {
+            document.getElementById('trainee-submit-btn').disabled = false;
+        }
+    });
+}
+
+// Fonctions pour sequence
+function moveSequenceUp(index) {
+    if (index === 0) return;
+
+    const temp = sequenceOrder[index];
+    sequenceOrder[index] = sequenceOrder[index - 1];
+    sequenceOrder[index - 1] = temp;
+
+    refreshSequenceDisplay();
+    document.getElementById('trainee-submit-btn').disabled = false;
+}
+
+function moveSequenceDown(index) {
+    if (index === sequenceOrder.length - 1) return;
+
+    const temp = sequenceOrder[index];
+    sequenceOrder[index] = sequenceOrder[index + 1];
+    sequenceOrder[index + 1] = temp;
+
+    refreshSequenceDisplay();
+    document.getElementById('trainee-submit-btn').disabled = false;
+}
+
+function refreshSequenceDisplay() {
+    database.ref('sessions/' + sessionId + '/currentGame').once('value', (snapshot) => {
+        const game = snapshot.val();
+        const container = document.getElementById('sequence-container');
+
+        container.innerHTML = sequenceOrder.map((originalIndex, index) => `
+            <div class="sequence-item bg-white/20 p-4 rounded-xl border-2 border-white/30 cursor-move flex justify-between items-center" data-index="${index}">
+                <span>${game.items[originalIndex]}</span>
+                <div class="flex gap-2">
+                    <button onclick="moveSequenceUp(${index})" class="bg-blue-500 px-3 py-1 rounded" ${index === 0 ? 'disabled' : ''}>↑</button>
+                    <button onclick="moveSequenceDown(${index})" class="bg-blue-500 px-3 py-1 rounded" ${index === sequenceOrder.length - 1 ? 'disabled' : ''}>↓</button>
+                </div>
+            </div>
+        `).join('');
+    });
+}
+
 function submitAnswer() {
-    if (selectedAnswer === null || !sessionId || !teamId) return;
+    if (!sessionId || !teamId) return;
 
     database.ref('sessions/' + sessionId + '/currentGame').once('value', (snapshot) => {
         const game = snapshot.val();
         if (!game) return;
 
-        const isCorrect = selectedAnswer === game.correctAnswer;
+        const gameType = game.type || 'quiz';
+        let isCorrect = false;
+        let answerData = null;
+
+        // Valider selon le type de jeu
+        if (gameType === 'quiz' || gameType === 'true-false') {
+            if (selectedAnswer === null) return;
+            isCorrect = selectedAnswer === game.correctAnswer;
+            answerData = selectedAnswer;
+        } else if (gameType === 'quiz-multi') {
+            if (selectedAnswers.length === 0) return;
+            // Vérifier que toutes les bonnes réponses sont sélectionnées et aucune mauvaise
+            const correctSet = new Set(game.correctAnswers);
+            const selectedSet = new Set(selectedAnswers);
+
+            isCorrect = correctSet.size === selectedSet.size &&
+                        [...correctSet].every(x => selectedSet.has(x));
+            answerData = selectedAnswers;
+        } else if (gameType === 'matching') {
+            if (matchingPairs.length !== game.pairs.length) return;
+            // Vérifier que toutes les paires sont correctes
+            isCorrect = matchingPairs.every(pair => pair.right === pair.correctRight);
+            answerData = matchingPairs;
+        } else if (gameType === 'sequence') {
+            // Vérifier que l'ordre est correct
+            isCorrect = sequenceOrder.every((val, index) => val === index);
+            answerData = sequenceOrder;
+        }
+
         const points = isCorrect ? (game.points || 100) : 0;
 
         const updates = {};
         updates['sessions/' + sessionId + '/teams/' + teamId + '/hasAnswered'] = true;
-        updates['sessions/' + sessionId + '/teams/' + teamId + '/answer'] = selectedAnswer;
+        updates['sessions/' + sessionId + '/teams/' + teamId + '/answer'] = JSON.stringify(answerData);
         updates['sessions/' + sessionId + '/teams/' + teamId + '/isCorrect'] = isCorrect;
         updates['sessions/' + sessionId + '/teams/' + teamId + '/lastPoints'] = points;
 
@@ -1845,14 +2107,66 @@ function showProjectorQuestion(game) {
     document.getElementById('projector-question-title').textContent = game.title + ' ' + game.icon;
     document.getElementById('projector-question-text').textContent = game.question;
 
-    // Afficher les options
     const container = document.getElementById('projector-options');
-    container.innerHTML = game.options.map((option, index) => `
-        <div class="bg-white/20 backdrop-blur-sm p-6 rounded-2xl border-2 border-white/30">
-            <div class="text-2xl font-bold mb-2">${String.fromCharCode(65 + index)}</div>
-            <div class="text-xl">${option}</div>
-        </div>
-    `).join('');
+    const gameType = game.type || 'quiz';
+
+    // Afficher selon le type de jeu
+    if (gameType === 'matching') {
+        // Affichage pour matching
+        const shuffledLeft = [...game.pairs].sort(() => Math.random() - 0.5);
+        const shuffledRight = [...game.pairs].map(p => p.right).sort(() => Math.random() - 0.5);
+
+        container.innerHTML = `
+            <div class="matching-container">
+                <div class="space-y-3">
+                    <h3 class="text-xl font-bold text-center mb-4">Colonne A</h3>
+                    ${shuffledLeft.map((pair, index) => `
+                        <div class="bg-white/20 backdrop-blur-sm p-4 rounded-xl border-2 border-white/30">
+                            <div class="text-lg font-bold">${index + 1}. ${pair.left}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="space-y-3">
+                    <h3 class="text-xl font-bold text-center mb-4">Colonne B</h3>
+                    ${shuffledRight.map((right, index) => `
+                        <div class="bg-white/20 backdrop-blur-sm p-4 rounded-xl border-2 border-white/30">
+                            <div class="text-lg font-bold">${String.fromCharCode(65 + index)}. ${right}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    } else if (gameType === 'sequence') {
+        // Affichage pour sequence
+        container.innerHTML = `
+            <div class="grid grid-cols-1 gap-3">
+                <p class="text-xl text-center mb-4">Remettez dans le bon ordre :</p>
+                ${game.items.map((item, index) => `
+                    <div class="bg-white/20 backdrop-blur-sm p-4 rounded-xl border-2 border-white/30">
+                        <div class="text-lg">${index + 1}. ${item}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else if (gameType === 'quiz-multi') {
+        // Affichage pour quiz-multi
+        container.innerHTML = game.options.map((option, index) => `
+            <div class="bg-white/20 backdrop-blur-sm p-6 rounded-2xl border-2 border-white/30">
+                <div class="flex items-center gap-3">
+                    <div class="text-2xl font-bold">${String.fromCharCode(65 + index)}</div>
+                    <div class="text-xl">${option}</div>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        // Affichage standard pour quiz et true-false
+        container.innerHTML = game.options.map((option, index) => `
+            <div class="bg-white/20 backdrop-blur-sm p-6 rounded-2xl border-2 border-white/30">
+                <div class="text-2xl font-bold mb-2">${String.fromCharCode(65 + index)}</div>
+                <div class="text-xl">${option}</div>
+            </div>
+        `).join('');
+    }
 
     updateTeamsStatus();
 }
@@ -1981,8 +2295,24 @@ function showCorrection() {
 
         showScreen('correction-screen');
 
+        const gameType = game.type || 'quiz';
         document.getElementById('correction-question').textContent = game.question;
-        document.getElementById('correction-answer').textContent = game.options[game.correctAnswer];
+
+        // Afficher la bonne réponse selon le type
+        if (gameType === 'matching') {
+            const correctPairs = game.pairs.map(p => `${p.left} → ${p.right}`).join(', ');
+            document.getElementById('correction-answer').textContent = correctPairs;
+        } else if (gameType === 'sequence') {
+            const correctOrder = game.items.join(' → ');
+            document.getElementById('correction-answer').textContent = correctOrder;
+        } else if (gameType === 'quiz-multi') {
+            const correctOptions = game.correctAnswers.map(i => String.fromCharCode(65 + i) + '. ' + game.options[i]).join(', ');
+            document.getElementById('correction-answer').textContent = correctOptions;
+        } else {
+            // quiz et true-false
+            document.getElementById('correction-answer').textContent = game.options[game.correctAnswer];
+        }
+
         document.getElementById('correction-explanation').textContent = game.explanation || '';
 
         // Afficher le classement
