@@ -1670,12 +1670,22 @@ function startGame() {
 function listenForGameUpdates() {
     if (!sessionId) return;
 
+    // Écouter le statut de la session
     database.ref('sessions/' + sessionId + '/status').on('value', (snapshot) => {
         const status = snapshot.val();
+        console.log('📊 Status session:', status);
 
         if (status === 'playing') {
-            database.ref('sessions/' + sessionId + '/gameStatus').once('value', (gameSnapshot) => {
+            // Écouter en permanence le gameStatus
+            database.ref('sessions/' + sessionId + '/gameStatus').on('value', (gameSnapshot) => {
                 const gameStatus = gameSnapshot.val();
+                console.log('🎮 Game status:', gameStatus);
+
+                // Charger aussi le currentGameIndex
+                database.ref('sessions/' + sessionId + '/currentGameIndex').once('value', (indexSnapshot) => {
+                    currentGameIndex = indexSnapshot.val() || 0;
+                    console.log('📝 Current game index:', currentGameIndex);
+                });
 
                 if (gameStatus === 'question') {
                     showTraineeAnswerScreen();
@@ -2107,66 +2117,14 @@ function showProjectorQuestion(game) {
     document.getElementById('projector-question-title').textContent = game.title + ' ' + game.icon;
     document.getElementById('projector-question-text').textContent = game.question;
 
+    // NE PAS AFFICHER LES OPTIONS SUR LE PROJECTEUR
+    // Les réponses sont uniquement sur l'écran des stagiaires
     const container = document.getElementById('projector-options');
-    const gameType = game.type || 'quiz';
-
-    // Afficher selon le type de jeu
-    if (gameType === 'matching') {
-        // Affichage pour matching
-        const shuffledLeft = [...game.pairs].sort(() => Math.random() - 0.5);
-        const shuffledRight = [...game.pairs].map(p => p.right).sort(() => Math.random() - 0.5);
-
-        container.innerHTML = `
-            <div class="matching-container">
-                <div class="space-y-3">
-                    <h3 class="text-xl font-bold text-center mb-4">Colonne A</h3>
-                    ${shuffledLeft.map((pair, index) => `
-                        <div class="bg-white/20 backdrop-blur-sm p-4 rounded-xl border-2 border-white/30">
-                            <div class="text-lg font-bold">${index + 1}. ${pair.left}</div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="space-y-3">
-                    <h3 class="text-xl font-bold text-center mb-4">Colonne B</h3>
-                    ${shuffledRight.map((right, index) => `
-                        <div class="bg-white/20 backdrop-blur-sm p-4 rounded-xl border-2 border-white/30">
-                            <div class="text-lg font-bold">${String.fromCharCode(65 + index)}. ${right}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    } else if (gameType === 'sequence') {
-        // Affichage pour sequence
-        container.innerHTML = `
-            <div class="grid grid-cols-1 gap-3">
-                <p class="text-xl text-center mb-4">Remettez dans le bon ordre :</p>
-                ${game.items.map((item, index) => `
-                    <div class="bg-white/20 backdrop-blur-sm p-4 rounded-xl border-2 border-white/30">
-                        <div class="text-lg">${index + 1}. ${item}</div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    } else if (gameType === 'quiz-multi') {
-        // Affichage pour quiz-multi
-        container.innerHTML = game.options.map((option, index) => `
-            <div class="bg-white/20 backdrop-blur-sm p-6 rounded-2xl border-2 border-white/30">
-                <div class="flex items-center gap-3">
-                    <div class="text-2xl font-bold">${String.fromCharCode(65 + index)}</div>
-                    <div class="text-xl">${option}</div>
-                </div>
-            </div>
-        `).join('');
-    } else {
-        // Affichage standard pour quiz et true-false
-        container.innerHTML = game.options.map((option, index) => `
-            <div class="bg-white/20 backdrop-blur-sm p-6 rounded-2xl border-2 border-white/30">
-                <div class="text-2xl font-bold mb-2">${String.fromCharCode(65 + index)}</div>
-                <div class="text-xl">${option}</div>
-            </div>
-        `).join('');
-    }
+    container.innerHTML = `
+        <div class="text-center p-8">
+            <p class="text-2xl text-white/60">Les réponses sont affichées sur l'écran des stagiaires</p>
+        </div>
+    `;
 
     updateTeamsStatus();
 }
