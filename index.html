@@ -1347,8 +1347,15 @@ const BOXES_DATA = {
 
 // Navigation
 function showScreen(screenId) {
+    console.log('📺 showScreen appelé pour:', screenId);
     document.querySelectorAll('body > div').forEach(div => div.classList.add('hidden'));
-    document.getElementById(screenId)?.classList.remove('hidden');
+    const screen = document.getElementById(screenId);
+    if (screen) {
+        screen.classList.remove('hidden');
+        console.log('✅ Écran affiché:', screenId);
+    } else {
+        console.error('❌ Écran introuvable:', screenId);
+    }
 }
 
 function showLoginScreen() {
@@ -1378,25 +1385,56 @@ function loginSupervisor() {
 }
 
 function createSession() {
-    sessionId = 'cup_ssiap_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    console.log('🔍 Recherche de session existante...');
 
-    console.log('🔥 Création session:', sessionId);
+    // Chercher une session cup_ssiap active
+    database.ref('sessions').orderByChild('type').equalTo('cup_ssiap').once('value', (snapshot) => {
+        const sessions = snapshot.val();
+        let existingSession = null;
 
-    database.ref('sessions/' + sessionId).set({
-        type: 'cup_ssiap',
-        supervisor: 'admin',
-        createdAt: Date.now(),
-        status: 'waiting',
-        teams: {},
-        currentGameIndex: 0,
-        totalGames: 20  // Mise à jour : 20 questions par niveau
-    }).then(() => {
-        console.log('✅ Session créée');
-        showScreen('supervisor-dashboard');
-        loadTeamsList();
-        generateQRCode();
-    }).catch((error) => {
-        console.error('❌ Erreur:', error);
+        if (sessions) {
+            // Trouver la session la plus récente (moins de 24h)
+            const now = Date.now();
+            const oneDayAgo = now - (24 * 60 * 60 * 1000);
+
+            Object.entries(sessions).forEach(([id, session]) => {
+                if (session.createdAt > oneDayAgo && session.status !== 'finished') {
+                    if (!existingSession || session.createdAt > existingSession.createdAt) {
+                        existingSession = { id, ...session };
+                    }
+                }
+            });
+        }
+
+        if (existingSession) {
+            // Restaurer la session existante
+            console.log('♻️ Restauration session existante:', existingSession.id);
+            sessionId = existingSession.id;
+            showScreen('supervisor-dashboard');
+            loadTeamsList();
+            generateQRCode();
+        } else {
+            // Créer une nouvelle session
+            sessionId = 'cup_ssiap_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            console.log('🔥 Création nouvelle session:', sessionId);
+
+            database.ref('sessions/' + sessionId).set({
+                type: 'cup_ssiap',
+                supervisor: 'admin',
+                createdAt: Date.now(),
+                status: 'waiting',
+                teams: {},
+                currentGameIndex: 0,
+                totalGames: 20
+            }).then(() => {
+                console.log('✅ Session créée');
+                showScreen('supervisor-dashboard');
+                loadTeamsList();
+                generateQRCode();
+            }).catch((error) => {
+                console.error('❌ Erreur:', error);
+            });
+        }
     });
 }
 
@@ -1670,37 +1708,58 @@ function startGame() {
 function listenForGameUpdates() {
     if (!sessionId) return;
 
-    // Écouter le statut de la session
+    console.log('👂 Mise en place des listeners pour sessionId:', sessionId);
+
+    // Écouter le gameStatus directement (ne pas imbriquer dans status)
+    database.ref('sessions/' + sessionId + '/gameStatus').on('value', (gameSnapshot) => {
+        const gameStatus = gameSnapshot.val();
+        console.log('🎮 Game status:', gameStatus);
+
+        if (!gameStatus) {
+            console.log('⚠️ Pas de gameStatus encore');
+            return;
+        }
+
+        // Charger le currentGameIndex AVANT d'afficher l'écran
+        database.ref('sessions/' + sessionId + '/currentGameIndex').once('value', (indexSnapshot) => {
+            currentGameIndex = indexSnapshot.val() || 0;
+            console.log('📝 Current game index chargé:', currentGameIndex);
+
+            // Maintenant afficher l'écran approprié
+            if (gameStatus === 'question') {
+                console.log('➡️ Affichage écran question');
+                showTraineeAnswerScreen();
+            } else if (gameStatus === 'correction') {
+                console.log('➡️ Affichage écran correction');
+                showTraineeResultScreen();
+            }
+        });
+    });
+
+    // Écouter aussi le status pour détecter la fin du jeu
     database.ref('sessions/' + sessionId + '/status').on('value', (snapshot) => {
         const status = snapshot.val();
         console.log('📊 Status session:', status);
 
-        if (status === 'playing') {
-            // Écouter en permanence le gameStatus
-            database.ref('sessions/' + sessionId + '/gameStatus').on('value', (gameSnapshot) => {
-                const gameStatus = gameSnapshot.val();
-                console.log('🎮 Game status:', gameStatus);
-
-                // Charger aussi le currentGameIndex
-                database.ref('sessions/' + sessionId + '/currentGameIndex').once('value', (indexSnapshot) => {
-                    currentGameIndex = indexSnapshot.val() || 0;
-                    console.log('📝 Current game index:', currentGameIndex);
-                });
-
-                if (gameStatus === 'question') {
-                    showTraineeAnswerScreen();
-                } else if (gameStatus === 'correction') {
-                    showTraineeResultScreen();
-                }
-            });
+        if (status === 'finished') {
+            // Afficher l'écran final si le jeu est terminé
+            showFinalScreen();
         }
     });
 }
 
 function showTraineeAnswerScreen() {
+    console.log('🎯 showTraineeAnswerScreen appelée');
+    console.log('📍 sessionId:', sessionId);
+
     database.ref('sessions/' + sessionId + '/currentGame').once('value', (snapshot) => {
         const game = snapshot.val();
-        if (!game) return;
+        console.log('🎮 Game récupéré:', game);
+
+        if (!game) {
+            console.error('❌ Aucune question trouvée');
+            return;
+        }
 
         showScreen('trainee-answer');
 
@@ -1716,6 +1775,9 @@ function showTraineeAnswerScreen() {
         const container = document.getElementById('trainee-options');
         const gameType = game.type || 'quiz';
 
+        console.log('🎲 Type de jeu:', gameType);
+        console.log('📦 Conteneur trainee-options:', container);
+
         // Réinitialiser les variables
         selectedAnswer = null;
         selectedAnswers = [];
@@ -1725,7 +1787,9 @@ function showTraineeAnswerScreen() {
         selectedRight = null;
 
         // Afficher selon le type de jeu
+        console.log('🔧 Affichage des options pour type:', gameType);
         if (gameType === 'matching') {
+            console.log('🔗 Rendu matching avec pairs:', game.pairs);
             // Interface matching pour stagiaires
             const shuffledLeft = [...game.pairs].sort(() => Math.random() - 0.5);
             const shuffledRight = [...game.pairs].map(p => p.right).sort(() => Math.random() - 0.5);
@@ -1778,13 +1842,18 @@ function showTraineeAnswerScreen() {
             `).join('');
         } else {
             // Interface standard pour quiz et true-false
-            container.innerHTML = game.options.map((option, index) => `
+            console.log('📝 Rendu quiz/true-false avec options:', game.options);
+            const html = game.options.map((option, index) => `
                 <button onclick="selectAnswer(${index})" class="option-btn px-6 py-4 rounded-xl font-bold text-lg transition hover:scale-105 bg-white/20 border-2 border-white/30" data-index="${index}">
                     ${String.fromCharCode(65 + index)}. ${option}
                 </button>
             `).join('');
+            console.log('✅ HTML généré, longueur:', html.length);
+            container.innerHTML = html;
+            console.log('✅ innerHTML assigné, contenu:', container.innerHTML.substring(0, 100));
         }
 
+        console.log('🔘 Désactivation du bouton submit');
         document.getElementById('trainee-submit-btn').disabled = true;
 
         // Charger le score
