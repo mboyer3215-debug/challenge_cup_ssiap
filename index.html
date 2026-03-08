@@ -735,9 +735,9 @@ function createNewSupervisorSession(){
 
     // QR Code
     const qrEl=document.getElementById('qrcode-container');qrEl.innerHTML='';
-    const gameUrl=window.location.href.split('?')[0];
+    const gameUrl = window.location.href.split('?')[0] + '?mode=trainee';
     new QRCode(qrEl,{text:gameUrl,width:200,height:200,colorDark:'#3B82F6',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
-    document.getElementById('session-url-display').textContent=gameUrl;
+    document.getElementById('session-url-display').textContent = gameUrl;
 
     database.ref('sessions/'+sessionId+'/teams').on('value',snap=>updateTeamsList(snap.val()));
 
@@ -898,9 +898,9 @@ function initializeSupervisor(){
 
     // QR Code (pointe vers l'URL de base, sans paramètres)
     const qrEl=document.getElementById('qrcode-container');qrEl.innerHTML='';
-    const gameUrl=window.location.href.split('?')[0];
+    const gameUrl = window.location.href.split('?')[0] + '?mode=trainee';
     new QRCode(qrEl,{text:gameUrl,width:200,height:200,colorDark:'#3B82F6',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
-    document.getElementById('session-url-display').textContent=gameUrl;
+    document.getElementById('session-url-display').textContent = gameUrl;
 
     // Créer la session
     database.ref('sessions/'+sessionId).set({
@@ -1371,51 +1371,62 @@ document.getElementById('reset-game-btn').addEventListener('click',()=>{
    ════════════════════════════════════════════ */
 window.addEventListener('DOMContentLoaded',()=>{
     loadAdminSettings();
+    initPinInputs('pin', validatePinAndJoin);
+    document.getElementById('validate-pin-btn').addEventListener('click', validatePinAndJoin);
 
-    // Initialiser les PIN inputs
-    initPinInputs('pin',validatePinAndJoin);
-    document.getElementById('validate-pin-btn').addEventListener('click',validatePinAndJoin);
+    const params = new URLSearchParams(window.location.search);
+    const modeParam   = params.get('mode');      // ✅ NOUVEAU
+    const sessionParam = params.get('session');
+    const teamParam    = params.get('team');
 
-    // Vérifier si URL contient un paramètre session (QR code)
-    const params=new URLSearchParams(window.location.search);
-    const sessionParam=params.get('session');
-    const teamParam=params.get('team');
+    // ✅ QR Code scanné → afficher directement la page stagiaire
+    if(modeParam === 'trainee'){
+        userRole = 'trainee';
+        showScreenSafe('trainee-login');
+        // Remettre à zéro les étapes
+        document.getElementById('step-pin').classList.remove('hidden');
+        document.getElementById('step-name').classList.add('hidden');
+        setTimeout(()=>document.getElementById('pin-0')?.focus(), 300);
+        return; // ← important : stop ici
+    }
 
+    // Reconnexion via URL session+team (cas existant)
     if(sessionParam){
-        sessionId=sessionParam;
+        sessionId = sessionParam;
         if(teamParam){
-            const wait=setInterval(()=>{
-                if(!database) return;clearInterval(wait);
+            const wait = setInterval(()=>{
+                if(!database) return; clearInterval(wait);
                 database.ref('sessions/'+sessionId+'/teams/'+teamParam).once('value').then(snap=>{
-                    if(snap.exists()){teamId=teamParam;reconnectToSession(sessionParam,teamParam,snap.val());}
-                    else{
-                        userRole='trainee';
-                        // Pré-remplir la session depuis l'URL
-                        validatedSessionId=sessionParam;
-                        document.getElementById('step-pin').classList.add('hidden');
-                        document.getElementById('step-name').classList.remove('hidden');
-                        showScreenSafe('trainee-login');
-                    }
-                });
-            },200);
-        }else{
-            // QR code → on va chercher le PIN de cette session
-            const wait=setInterval(()=>{
-                if(!database) return;clearInterval(wait);
-                database.ref('sessions/'+sessionParam+'/gamePin').once('value',snap=>{
                     if(snap.exists()){
-                        // Session valide depuis QR code — aller directement au nom
-                        userRole='trainee';
-                        validatedSessionId=sessionParam;
-                        sessionId=sessionParam;
+                        teamId = teamParam;
+                        reconnectToSession(sessionParam, teamParam, snap.val());
+                    }else{
+                        userRole = 'trainee';
+                        validatedSessionId = sessionParam;
                         document.getElementById('step-pin').classList.add('hidden');
                         document.getElementById('step-name').classList.remove('hidden');
                         showScreenSafe('trainee-login');
-                    }else{
-                        userRole='trainee';showScreenSafe('trainee-login');
                     }
                 });
-            },200);
+            }, 200);
+        }else{
+            // QR code ancien format (avec ?session=...)
+            const wait = setInterval(()=>{
+                if(!database) return; clearInterval(wait);
+                database.ref('sessions/'+sessionParam+'/gamePin').once('value', snap=>{
+                    userRole = 'trainee';
+                    if(snap.exists()){
+                        validatedSessionId = sessionParam;
+                        sessionId = sessionParam;
+                        document.getElementById('step-pin').classList.add('hidden');
+                        document.getElementById('step-name').classList.remove('hidden');
+                    }else{
+                        document.getElementById('step-pin').classList.remove('hidden');
+                        document.getElementById('step-name').classList.add('hidden');
+                    }
+                    showScreenSafe('trainee-login');
+                });
+            }, 200);
         }
     }
 });
